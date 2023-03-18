@@ -1,0 +1,75 @@
+{
+	"name": "listr-cli",
+	"version": "0.1.0",
+	"description": "Command-line task lists made pretty.",
+	"keywords": [
+		"cli",
+		"cli-app",
+		"listr",
+		"listr2",
+		"command line",
+		"task",
+		"test"
+	],
+	"license": "MIT",
+	"author": {
+		"name": "Tommy Mitchell",
+		"url": "https://tommymitchell.io"
+	},
+	"type": "module",
+	"bin": {
+		"listr": "cli.js"
+	},
+	"files": [
+		"cli.js"
+	],
+	"scripts": {
+		"test": "xo && c8 ava"
+	},
+	"dependencies": {
+		"execa": "^7.1.1",
+		"listr2": "^5.0.8",
+		"meow": "^11.0.0"
+	},
+	"devDependencies": {
+		"ava": "^5.2.0",
+		"c8": "^7.13.0",
+		"get-bin-path": "^8.0.0",
+		"xo": "^0.53.1"
+	},
+	"engines": {
+		"node": ">=14.8.0"
+	},
+	"xo": {
+		"rules": {
+			"quotes": [
+				"error",
+				"double"
+			],
+			"object-shorthand": [
+				"error",
+				"always",
+				{
+					"avoidExplicitReturnArrows": false
+				}
+			],
+			"keyword-spacing": [
+				"error",
+				{
+					"overrides": {
+						"if": {
+							"after": false
+						},
+						"for": {
+							"after": false
+						},
+						"while": {
+							"after": false
+						}
+					}
+				}
+			],
+			"arrow-parens": "off"
+		}
+	}
+}
