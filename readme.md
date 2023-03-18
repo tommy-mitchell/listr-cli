@@ -2,7 +2,7 @@
 
 Command-line task lists made pretty.
 
-![](media/demo.gif)
+<p align="center"><img src="media/demo.gif"></p>
 
 Greacfully handles and displays failures, including if a given command is not found.
 
