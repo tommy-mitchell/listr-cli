@@ -12,6 +12,7 @@
 		"test"
 	],
 	"license": "MIT",
+	"repository": "tommy-mitchell/listr-cli",
 	"author": {
 		"name": "Tommy Mitchell",
 		"url": "https://tommymitchell.io"
