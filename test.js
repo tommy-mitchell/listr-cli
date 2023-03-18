@@ -61,10 +61,10 @@ test("reports when command not found", cliFails, "tsd", [
 	"[TITLE] tsd: command not found.",
 ]);
 
-test("reports when multi-word command not found", cliFails, "cowsay hello", [
-	"[STARTED] cowsay",
-	"[TITLE] Running \"cowsay hello\"...",
-	"[TITLE] cowsay: command \"cowsay hello\" not found.",
+test("reports when multi-word command not found", cliFails, "foobar hello", [
+	"[STARTED] foobar",
+	"[TITLE] Running \"foobar hello\"...",
+	"[TITLE] foobar: command \"foobar hello\" not found.",
 ]);
 
 test("successfully runs multiple commands", cliPasses, ["sleep 1", "echo 2"], [
