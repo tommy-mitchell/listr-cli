@@ -9,8 +9,18 @@ Gracefully handles and displays failures, including if a given command is not fo
 ## Install
 
 ```sh
-npm install listr-cli
+npm install --save-dev listr-cli
 ```
+
+<details>
+<summary>Other Package Managers</summary>
+
+```sh
+yarn add -D listr-cli
+```
+</details>
+
+*Node 14.8 or higher required.*
 
 ## Usage
 
