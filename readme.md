@@ -4,7 +4,7 @@ Command-line task lists made pretty.
 
 <p align="center"><img src="media/demo.gif"></p>
 
-Greacfully handles and displays failures, including if a given command is not found.
+Gracefully handles and displays failures, including if a given command is not found.
 
 ## Install
 
