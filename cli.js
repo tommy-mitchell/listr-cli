@@ -5,12 +5,12 @@ import {Listr} from "listr2";
 import {$} from "execa";
 
 const cli = meow(`
-    Usage
-      $ listr <command> [...]
+	Usage
+	  $ listr <command> […]
 
-      Commands should be space-separated. Commands with spaces in them must be surrounded by quotes.
+	  Commands should be space-separated. Commands with spaces in them must be surrounded by quotes.
 
-	  Equivalent to 'command1 && command2 && ...'.
+	  Equivalent to 'command1 && command2 && …'.
 
 	Options
 	  --all-optional  Continue executing tasks if one fails.      [default: exit]

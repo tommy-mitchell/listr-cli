@@ -150,11 +150,11 @@ test("outputs stdout and stderr", cliPasses, "node -e 'console.log(true); consol
 
 const helpText = [
 	"Usage",
-	"$ listr <command> [...]",
+	"$ listr <command> […]",
 	"",
 	"Commands should be space-separated. Commands with spaces in them must be surrounded by quotes.",
 	"",
-	"Equivalent to 'command1 && command2 && ...'.",
+	"Equivalent to 'command1 && command2 && …'.",
 	"",
 	"Options",
 	"--all-optional  Continue executing tasks if one fails.      [default: exit]",
@@ -171,3 +171,5 @@ const helpText = [
 test("running without arguments displays help text", cliPasses, "", helpText);
 
 test("flags: -h", cliPasses, "-h", helpText);
+
+test.todo("verify help text indentation is consistent");
