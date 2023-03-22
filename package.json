@@ -35,7 +35,7 @@
 	"devDependencies": {
 		"ava": "^5.2.0",
 		"c8": "^7.13.0",
-		"get-bin-path": "^8.0.0",
+		"get-bin-path": "^9.0.0",
 		"xo": "^0.53.1"
 	},
 	"engines": {
