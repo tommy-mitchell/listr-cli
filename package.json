@@ -28,6 +28,7 @@
 		"test": "xo && c8 ava"
 	},
 	"dependencies": {
+		"ci-info": "^3.8.0",
 		"execa": "^7.1.1",
 		"listr2": "^5.0.8",
 		"meow": "^11.0.0"

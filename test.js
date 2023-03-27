@@ -1,4 +1,5 @@
 /* eslint-disable ava/no-todo-test */
+import process from "node:process";
 import test from "ava";
 import {execa} from "execa";
 import {getBinPath} from "get-bin-path";
@@ -6,13 +7,17 @@ import {getBinPath} from "get-bin-path";
 const binPath = await getBinPath();
 const trim = (stdout) => stdout.trim().split("\n").map(line => line.trim());
 
-const verifyCli = (shouldPass) => test.macro(async (t, commands, expectedLines) => {
+const verifyCli = (shouldPass, setup = async () => {}, teardown = async () => {}) => test.macro(async (t, commands, expectedLines) => {
+	await setup();
+
 	const args = commands ? [commands].flat() : undefined;
 	const {exitCode, stdout} = await execa(binPath, args, {reject: false});
 	const receivedLines = trim(stdout);
 
-	t.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
 	t.deepEqual(receivedLines, expectedLines, "CLI output different than expectations!");
+	t.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
+
+	await teardown();
 });
 
 const cliPasses = verifyCli(true);
@@ -33,6 +38,9 @@ const falseCliLines = [
 	`[TITLE] Running "${falseCommand}"...`,
 	"[TITLE] node",
 ];
+
+// eslint-disable-next-line no-return-assign
+test.before("disable CI check", () => process.env.CI = "false");
 
 test("main", cliPasses, trueCommand, trueCliLines);
 
@@ -147,6 +155,11 @@ test("outputs stdout and stderr", cliPasses, "node -e 'console.log(true); consol
 	"[DATA]",
 	"[SUCCESS] node",
 ]);
+
+// eslint-disable-next-line no-return-assign
+const cliPassesCi = verifyCli(true, () => process.env.CI = "true", () => process.env.CI = "false");
+
+test.serial("uses silent renderer in CI", cliPassesCi, "node -e 'console.log(true)'", ["true"]);
 
 const helpText = [
 	"Usage",

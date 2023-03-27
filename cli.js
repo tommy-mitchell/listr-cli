@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import process from "node:process";
+import {isCI} from "ci-info";
 import meow from "meow";
 import {Listr} from "listr2";
 import {$} from "execa";
@@ -89,6 +90,10 @@ const trimIfNeeded = (output) => {
 const tasks = new Listr(commands.map(command => /** @type {import('listr2').ListrTask} */({
 	title: parseCommand(command),
 	task: async ({$$}, task) => {
+		if(isCI) {
+			return $({shell: true, stdio: "inherit"})`${command}`;
+		}
+
 		const [commandName, args] = parseCommand(command, {getArgs: true});
 
 		task.title = `Running "${command}"...`;
@@ -123,6 +128,7 @@ const tasks = new Listr(commands.map(command => /** @type {import('listr2').List
 		formatOutput: "wrap",
 		removeEmptyLines: false,
 	},
+	rendererSilent: isCI,
 });
 
 await tasks.run({

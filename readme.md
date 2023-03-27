@@ -6,6 +6,8 @@ Command-line task lists made pretty.
 
 Gracefully handles and displays failures, including if a given command is not found.
 
+If used in a CI environment, command output is outputted as is.
+
 ## Install
 
 ```sh
