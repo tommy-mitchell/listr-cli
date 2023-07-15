@@ -24,6 +24,9 @@
 	"files": [
 		"cli.js"
 	],
+	"engines": {
+		"node": ">=16"
+	},
 	"scripts": {
 		"test": "xo && c8 ava"
 	},
@@ -33,44 +36,9 @@
 		"meow": "^11.0.0"
 	},
 	"devDependencies": {
-		"ava": "^5.2.0",
-		"c8": "^7.13.0",
-		"get-bin-path": "^9.0.0",
-		"xo": "^0.53.1"
-	},
-	"engines": {
-		"node": ">=14.8.0"
-	},
-	"xo": {
-		"rules": {
-			"quotes": [
-				"error",
-				"double"
-			],
-			"object-shorthand": [
-				"error",
-				"always",
-				{
-					"avoidExplicitReturnArrows": false
-				}
-			],
-			"keyword-spacing": [
-				"error",
-				{
-					"overrides": {
-						"if": {
-							"after": false
-						},
-						"for": {
-							"after": false
-						},
-						"while": {
-							"after": false
-						}
-					}
-				}
-			],
-			"arrow-parens": "off"
-		}
+		"ava": "^5.3.1",
+		"c8": "^8.0.0",
+		"get-bin-path": "^10.0.0",
+		"xo": "^0.55.0"
 	}
 }
