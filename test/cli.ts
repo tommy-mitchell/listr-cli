@@ -1,14 +1,25 @@
-/* eslint-disable ava/no-todo-test */
-import test from "ava";
-import {execa} from "execa";
-import {getBinPath} from "get-bin-path";
+import anyTest, { type TestFn } from "ava";
+import { execa } from "execa";
+import { getBinPath } from "get-bin-path";
+import { isExecutable } from "is-executable";
 
-const binPath = await getBinPath();
-const trim = (stdout) => stdout.trim().split("\n").map(line => line.trim());
+const test = anyTest as TestFn<{
+	binPath: string;
+}>;
 
-const verifyCli = (shouldPass) => test.macro(async (t, commands, expectedLines) => {
+test.before("setup context", async t => {
+	const binPath = await getBinPath();
+	t.truthy(binPath, "No bin path found!");
+
+	t.context.binPath = binPath!.replace("dist", "src").replace(".js", ".ts");
+	t.true(await isExecutable(t.context.binPath), "Source binary not executable!");
+});
+
+const trim = (stdout: string) => stdout.trim().split("\n").map(line => line.trim());
+
+const verifyCli = (shouldPass: boolean) => test.macro(async (t, commands: string | string[], expectedLines: string[]) => {
 	const args = commands ? [commands].flat() : undefined;
-	const {exitCode, stdout} = await execa(binPath, args, {reject: false});
+	const { exitCode, stdout } = await execa(t.context.binPath, args, { reject: false });
 	const receivedLines = trim(stdout);
 
 	t.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
