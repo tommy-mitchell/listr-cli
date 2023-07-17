@@ -1,5 +1,6 @@
 import { Listr, type ListrTask } from "listr2";
-import type { ExecaReturnValue, $ } from "execa";
+import { $, type ExecaReturnValue } from "execa";
+import { isCI } from "ci-info";
 import { parseCommand, trimIfNeeded } from "./helpers.js";
 
 /**
@@ -26,6 +27,10 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 	const tasks = commands.map(command => ({
 		title: parseCommand(command),
 		task: async ({ $$ }, task) => {
+			if(isCI) {
+				return $({ shell: true, stdio: "inherit" })`${command}`;
+			}
+
 			const [commandName, args] = parseCommand(command, { getArgs: true });
 
 			task.title = `Running "${command}"...`;
@@ -62,5 +67,6 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 			formatOutput: "wrap",
 			removeEmptyLines: false,
 		},
+		rendererSilent: isCI,
 	});
 };
