@@ -2,6 +2,7 @@ import anyTest, { type TestFn } from "ava";
 import { execa } from "execa";
 import { getBinPath } from "get-bin-path";
 import { isExecutable } from "is-executable";
+import stripAnsi from "strip-ansi";
 
 const test = anyTest as TestFn<{
 	binPath: string;
@@ -15,7 +16,7 @@ test.before("setup context", async t => {
 	t.true(await isExecutable(t.context.binPath), "Source binary not executable!");
 });
 
-const trim = (stdout: string) => stdout.trim().split("\n").map(line => line.trim());
+const trim = (stdout: string) => stdout.trim().split("\n").map(line => stripAnsi(line).trim());
 
 const verifyCli = (shouldPass: boolean) => test.macro(async (t, commands: string | string[], expectedLines: string[]) => {
 	const args = commands ? [commands].flat() : undefined;
