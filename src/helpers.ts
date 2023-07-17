@@ -33,5 +33,3 @@ export const trimIfNeeded = (output: string) => {
 
 	return trimmed.includes("\n") ? output : trimmed;
 };
-
-// TODO: add individual tests?

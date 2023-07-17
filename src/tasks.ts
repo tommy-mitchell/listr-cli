@@ -1,6 +1,6 @@
 import { Listr, type ListrTask } from "listr2";
 import type { ExecaReturnValue, $ } from "execa";
-import { parseCommand, trimIfNeeded } from "./helpers.js"; // TODO: .ts
+import { parseCommand, trimIfNeeded } from "./helpers.js";
 
 /**
  * Fails a task. Stops the task list if `cli.flags.allOptional`
