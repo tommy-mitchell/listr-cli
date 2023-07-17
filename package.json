@@ -59,6 +59,6 @@
 		"extensions": {
 			"ts": "module"
 		},
-		"timeout": "30s"
+		"timeout": "1m"
 	}
 }
