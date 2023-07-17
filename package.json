@@ -31,7 +31,8 @@
 		"prepublishOnly": "npm run build",
 		"build": "tsc && chmodx --package",
 		"postbuild": "replace-in-files dist/cli.js --string='#!/usr/bin/env tsx' --replacement='#!/usr/bin/env node'",
-		"test": "xo && tsc --noEmit && c8 ava"
+		"test": "xo && tsc --noEmit && c8 yarn ava:run",
+		"ava:run": "NODE_OPTIONS='--loader=tsx --no-warnings=ExperimentalWarning' ava"
 	},
 	"dependencies": {
 		"execa": "^7.1.1",
@@ -58,10 +59,6 @@
 		"extensions": {
 			"ts": "module"
 		},
-		"nodeArguments": [
-			"--loader=tsx",
-			"--no-warnings=ExperimentalWarning"
-		],
 		"timeout": "30s"
 	}
 }
