@@ -1,6 +1,6 @@
 {
 	"name": "listr-cli",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"description": "Command-line task lists made pretty.",
 	"keywords": [
 		"cli",
@@ -35,6 +35,7 @@
 		"run:ava": "NODE_OPTIONS='--loader=tsx --no-warnings=ExperimentalWarning' ava"
 	},
 	"dependencies": {
+		"ci-info": "^3.8.0",
 		"execa": "^7.1.1",
 		"listr2": "^5.0.8",
 		"meow": "^11.0.0"
