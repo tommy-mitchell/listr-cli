@@ -26,6 +26,7 @@ type TaskContext = {
 export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 	const tasks = commands.map(command => ({
 		title: parseCommand(command),
+		// @ts-expect-error: return works
 		task: async ({ $$ }, task) => {
 			if(isCI) {
 				return $({ shell: true, stdio: "inherit" })`${command}`;
