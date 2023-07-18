@@ -29,7 +29,7 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 		title: parseCommand(command),
 		// @ts-expect-error: return works
 		task: async ({ $$ }, task) => {
-			if(isCI) {
+			if (isCI) {
 				return $({ shell: true, stdio: "inherit" })`${command}`;
 			}
 
@@ -39,7 +39,7 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 
 			const { exitCode, all, message } = await $$`${commandName} ${args}` as ExecaReturnValue & { all: string; message: string };
 
-			if(exitCode === 127 || message?.includes("ENOENT")) {
+			if (exitCode === 127 || message?.includes("ENOENT")) {
 				task.title = commandName === command
 					? `${commandName}: command not found.`
 					: `${commandName}: command "${command}" not found.`;
@@ -49,7 +49,7 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 
 			task.title = commandName;
 
-			if(exitCode !== 0) {
+			if (exitCode !== 0) {
 				endTask(trimIfNeeded(all));
 			}
 

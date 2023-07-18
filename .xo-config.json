@@ -7,11 +7,6 @@
 	    "@typescript-eslint/object-curly-spacing": ["error", "always"],
 		"@typescript-eslint/no-confusing-void-expression": ["error", { "ignoreArrowShorthand": true }],
 		"object-shorthand": ["error", "always", { "avoidExplicitReturnArrows": false }],
-		"@typescript-eslint/keyword-spacing": ["error", { "overrides": {
-			"if": { "after": false },
-			"for": {"after": false },
-			"while": {"after": false },
-			"catch": {"after": false }
-		}}]
+		"n/file-extension-in-import": ["error", "always", { ".ts": "always" }]
 	}
 }
