@@ -34,7 +34,7 @@ Equivalent to `command1 && command2 && …`.
 
 ### Named Tasks
 
-Tasks can be pre-fixed with a custom name. By default, task titles use the first word of a command.
+Tasks can be prefixed with a custom name. By default, task titles use the first word of a command.
 
 <details>
 <summary>Example</summary>
@@ -74,10 +74,8 @@ Disable showing successful task durations. By default, durations are shown.
 <summary>Example</summary>
 
 ```sh
-$ npx listr xo 'ava --tap | node parse.js' tsd --hide-timer
+$ npx listr xo tsd --hide-timer
 ✔ xo
-✖ ava
-  › Passed: 10, Failed: 2
 ✔ tsd
 ```
 
