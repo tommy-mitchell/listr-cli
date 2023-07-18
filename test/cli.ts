@@ -203,3 +203,5 @@ test("running without arguments displays help text", cliPasses, "", helpText);
 test("flags: -h", cliPasses, "-h", helpText);
 
 test.todo("verify help text indentation is consistent");
+
+test.todo("task output displays color");
