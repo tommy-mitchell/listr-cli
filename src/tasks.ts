@@ -62,6 +62,7 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 
 	return new Listr<ListrContext, "default", "verbose">(tasks, {
 		exitOnError,
+		forceColor: true,
 		rendererOptions: {
 			timer: {
 				...PRESET_TIMER,
@@ -77,6 +78,5 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 		fallbackRendererOptions: {
 			logTitleChange: true,
 		},
-		// Force color?
 	});
 };
