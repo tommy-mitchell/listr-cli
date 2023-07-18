@@ -19,13 +19,20 @@
 	},
 	"type": "module",
 	"bin": {
-		"listr": "cli.js"
+		"listr": "dist/cli.js"
 	},
 	"files": [
-		"cli.js"
+		"dist"
 	],
+	"engines": {
+		"node": ">=16"
+	},
 	"scripts": {
-		"test": "xo && c8 ava"
+		"prepublishOnly": "npm run build",
+		"build": "tsc && chmodx --package",
+		"postbuild": "replace-in-files dist/cli.js --string='#!/usr/bin/env tsx' --replacement='#!/usr/bin/env node'",
+		"test": "xo && tsc --noEmit && c8 yarn run:ava",
+		"run:ava": "NODE_OPTIONS='--loader=tsx --no-warnings=ExperimentalWarning' ava"
 	},
 	"dependencies": {
 		"ci-info": "^3.8.0",
@@ -34,44 +41,27 @@
 		"meow": "^11.0.0"
 	},
 	"devDependencies": {
-		"ava": "^5.2.0",
-		"c8": "^7.13.0",
-		"get-bin-path": "^9.0.0",
-		"xo": "^0.53.1"
+		"@johnowennixon/chmodx": "^1.1.0",
+		"@tommy-mitchell/tsconfig": "^1.1.0",
+		"@types/node": "^20.4.2",
+		"ava": "^5.3.1",
+		"c8": "^8.0.0",
+		"ci-info": "^3.8.0",
+		"get-bin-path": "^10.0.0",
+		"is-executable": "^2.0.1",
+		"replace-in-files-cli": "^2.2.0",
+		"strip-ansi": "^7.1.0",
+		"tsx": "^3.12.7",
+		"typescript": "~5.1.6",
+		"xo": "^0.54.2"
 	},
-	"engines": {
-		"node": ">=14.8.0"
-	},
-	"xo": {
-		"rules": {
-			"quotes": [
-				"error",
-				"double"
-			],
-			"object-shorthand": [
-				"error",
-				"always",
-				{
-					"avoidExplicitReturnArrows": false
-				}
-			],
-			"keyword-spacing": [
-				"error",
-				{
-					"overrides": {
-						"if": {
-							"after": false
-						},
-						"for": {
-							"after": false
-						},
-						"while": {
-							"after": false
-						}
-					}
-				}
-			],
-			"arrow-parens": "off"
-		}
+	"ava": {
+		"files": [
+			"test/*.ts"
+		],
+		"extensions": {
+			"ts": "module"
+		},
+		"timeout": "1m"
 	}
 }

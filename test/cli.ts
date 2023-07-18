@@ -1,24 +1,41 @@
-/* eslint-disable ava/no-todo-test */
 import process from "node:process";
-import test from "ava";
-import {execa} from "execa";
-import {getBinPath} from "get-bin-path";
+import anyTest, { type TestFn } from "ava";
+import { execa } from "execa";
+import { getBinPath } from "get-bin-path";
+import { isExecutable } from "is-executable";
+import stripAnsi from "strip-ansi";
 
-const binPath = await getBinPath();
-const trim = (stdout) => stdout.trim().split("\n").map(line => line.trim());
+const test = anyTest as TestFn<{
+	binPath: string;
+}>;
 
-const verifyCli = (shouldPass, setup = async () => {}, teardown = async () => {}) => test.macro(async (t, commands, expectedLines) => {
-	await setup();
+test.before("setup context", async t => {
+	const binPath = await getBinPath();
+	t.truthy(binPath, "No bin path found!");
 
-	const args = commands ? [commands].flat() : undefined;
-	const {exitCode, stdout} = await execa(binPath, args, {reject: false});
-	const receivedLines = trim(stdout);
-
-	t.deepEqual(receivedLines, expectedLines, "CLI output different than expectations!");
-	t.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
-
-	await teardown();
+	t.context.binPath = binPath!.replace("dist", "src").replace(".js", ".ts");
+	t.true(await isExecutable(t.context.binPath), "Source binary not executable!");
 });
+
+// eslint-disable-next-line no-return-assign
+test.before("disable CI check", () => process.env.CI = "false");
+
+const trim = (stdout: string) => stdout.trim().split("\n").map(line => stripAnsi(line).trim());
+
+const verifyCli = (shouldPass: boolean, setup = async () => "", teardown = async () => "") => (
+	test.macro(async (t, commands: string | string[], expectedLines: string[]) => {
+		await setup();
+
+		const args = commands ? [commands].flat() : undefined;
+		const { exitCode, stdout } = await execa(t.context.binPath, args, { reject: false });
+		const receivedLines = trim(stdout);
+
+		t.deepEqual(receivedLines, expectedLines, "CLI output different than expectations!");
+		t.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
+
+		await teardown();
+	})
+);
 
 const cliPasses = verifyCli(true);
 const cliFails = verifyCli(false);
@@ -38,9 +55,6 @@ const falseCliLines = [
 	`[TITLE] Running "${falseCommand}"...`,
 	"[TITLE] node",
 ];
-
-// eslint-disable-next-line no-return-assign
-test.before("disable CI check", () => process.env.CI = "false");
 
 test("main", cliPasses, trueCommand, trueCliLines);
 
@@ -157,7 +171,7 @@ test("outputs stdout and stderr", cliPasses, "node -e 'console.log(true); consol
 ]);
 
 // eslint-disable-next-line no-return-assign
-const cliPassesCi = verifyCli(true, () => process.env.CI = "true", () => process.env.CI = "false");
+const cliPassesCi = verifyCli(true, async () => process.env.CI = "true", async () => process.env.CI = "false");
 
 test.serial("uses silent renderer in CI", cliPassesCi, "node -e 'console.log(true)'", ["true"]);
 
