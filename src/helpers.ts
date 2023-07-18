@@ -16,7 +16,7 @@ export const parseCommand = <const GetArgs extends boolean = false>(
 ): ParsedCommand<GetArgs> => {
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#using_split
 	// Since the separator is " ", `command.split` will always have a string at index 0
-	const [commandName, ...args] = command.split(" ") as [string, ...string[]];
+	const [commandName, ...args] = command.split(" ");
 	const parsedCommand = (getArgs ? [commandName, args] : commandName) as ParsedCommand<GetArgs>;
 
 	return parsedCommand;

@@ -65,7 +65,7 @@ const { allOptional, hideTimer, environment } = cli.flags;
 if (environment) {
 	// Parse environment variables, based on https://github.com/rollup/rollup/blob/master/cli/run/index.ts#L42-L53
 	for (const pair of environment.split(",")) {
-		const [key, ...value] = pair.split(":") as [string, ...string[]];
+		const [key, ...value] = pair.split(":");
 
 		process.env[key] = value.length === 0 ? String(true) : value.join(":");
 	}
