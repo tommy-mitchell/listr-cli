@@ -22,8 +22,6 @@ yarn add -D listr-cli
 ```
 </details>
 
-*Node 14.8 or higher required.*
-
 ## Usage
 
 ```
@@ -50,4 +48,4 @@ $ listr
 
 ## Related
 
-- [listr2](https://github.com/cenk1cenk2/listr2) - The library used to build this.
+- [listr2](https://github.com/cenk1cenk2/listr2) - Create beautiful CLI interfaces via easy and logical to implement task lists that feel alive and interactive.
