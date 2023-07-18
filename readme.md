@@ -4,7 +4,7 @@ Command-line task lists made pretty.
 
 <p align="center"><img src="media/demo.gif"></p>
 
-Gracefully handles and displays failures, including if a given command is not found.
+Gracefully handles and displays failures, including if a given command is not found. Allows [setting environment variables](#environment---env--e) cross-platform.
 
 If used in a CI environment, command output is outputted as is.
 
@@ -24,26 +24,58 @@ yarn add -D listr-cli
 
 ## Usage
 
+```sh
+$ listr <command> […]
 ```
-$ listr
 
-  Usage
-    $ listr <command> […]
+Commands should be space-separated. Commands with spaces in them must be surrounded by quotes.
 
-    Commands should be space-separated. Commands with spaces in them must be surrounded by quotes.
+Equivalent to `command1 && command2 && …`.
 
-    Equivalent to 'command1 && command2 && …'.
+### Options
 
-  Options
-    --all-optional  Continue executing tasks if one fails.      [default: exit]
-    --hide-timer    Disable showing successful task durations.  [default: show]
+#### `--all-optional`
 
-  Examples
-    Run test commands in order
-    $ listr xo 'c8 ava'
+Continue executing tasks if one fails. *(default: exit)*
 
-    Run commands that can fail
-    $ listr xo ava tsd --all-optional
+<details>
+<summary>Example</summary>
+
+```sh
+$ npx listr xo 'ava --tap | node parse.js' tsd --all-optional
+✔ xo [2s]
+✖ ava
+  › Passed: 10, Failed: 2
+✔ tsd [2s]
+```
+
+</details>
+
+#### `--hide-timer`
+
+Disable showing successful task durations. *(default: show)*
+
+<details>
+<summary>Example</summary>
+
+```sh
+$ npx listr xo 'ava --tap | node parse.js' tsd --hide-timer
+✔ xo
+✖ ava
+  › Passed: 10, Failed: 2
+✔ tsd
+```
+
+</details>
+
+#### `--environment` (`--env`, `-e`)
+
+Set environment variables cross-platform via `process.env`. Follows the same syntax as [Rollup](https://rollupjs.org/command-line-interface/#environment-values):
+
+```sh
+$ listr ava --env CI,NODE_OPTIONS:'--loader=tsx'
+#=> process.env.CI = "true"
+#=> process.env.NODE_OPTIONS = "--loader=tsx"
 ```
 
 ## Related

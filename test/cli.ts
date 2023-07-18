@@ -205,3 +205,31 @@ test("flags: -h", cliPasses, "-h", helpText);
 test.todo("verify help text indentation is consistent");
 
 test.todo("task output displays color");
+
+const envVarsFixture = {
+	envVars: "FOO,BAR:baz",
+	commands: ["echo $FOO", "echo $BAR"],
+	output: [
+		"[STARTED] echo",
+		"[TITLE] Running \"echo $FOO\"...",
+		"[TITLE] echo",
+		"[OUTPUT] true",
+		"[COMPLETED] echo",
+		"[STARTED] echo",
+		"[TITLE] Running \"echo $BAR\"...",
+		"[TITLE] echo",
+		"[OUTPUT] baz",
+		"[COMPLETED] echo",
+	],
+};
+
+test("processes environment variables", cliPasses,
+	[`--environment=${envVarsFixture.envVars}`, ...envVarsFixture.commands], envVarsFixture.output,
+);
+
+test("processes environment variables: --env alias", cliPasses,
+	[`--env=${envVarsFixture.envVars}`, ...envVarsFixture.commands], envVarsFixture.output,
+);
+test("processes environment variables: -e short flag", cliPasses,
+	[`-e=${envVarsFixture.envVars}`, ...envVarsFixture.commands], envVarsFixture.output,
+);

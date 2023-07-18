@@ -44,6 +44,13 @@ const cli = meow(`
 			type: "boolean",
 			default: false,
 		},
+		environment: {
+			type: "string",
+			aliases: ["env"],
+			shortFlag: "e",
+			// TODO: Disabled due to sindresorhus/meow#164
+			// isMultiple: true,
+		},
 	},
 });
 
@@ -53,7 +60,16 @@ if (commands.length === 0 || helpShortFlag) {
 	cli.showHelp(0);
 }
 
-const { allOptional, hideTimer } = cli.flags;
+const { allOptional, hideTimer, environment } = cli.flags;
+
+if (environment) {
+	// Parse environment variables, based on https://github.com/rollup/rollup/blob/master/cli/run/index.ts#L42-L53
+	for (const pair of environment.split(",")) {
+		const [key, ...value] = pair.split(":") as [string, ...string[]];
+
+		process.env[key] = value.length === 0 ? String(true) : value.join(":");
+	}
+}
 
 const tasks = getTasks({
 	commands,
