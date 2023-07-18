@@ -1,26 +1,21 @@
-type ParsedCommand<GetArgs extends boolean> = (
-	GetArgs extends true
-		? [commandName: string, args: string[]]
-		: string
-);
-
-/**
- * Returns the name of a given command and optionally any of its arguments.
- *
- * @param command The given command to parse.
- * @param getArgs Whether or not to return the command's arguments.
- */
-export const parseCommand = <const GetArgs extends boolean = false>(
-	command: string,
-	{ getArgs }: { getArgs?: GetArgs } = {},
-): ParsedCommand<GetArgs> => {
-	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#using_split
-	// Since the separator is " ", `command.split` will always have a string at index 0
-	const [commandName, ...args] = command.split(" ");
-	const parsedCommand = (getArgs ? [commandName, args] : commandName) as ParsedCommand<GetArgs>;
-
-	return parsedCommand;
+export type Command = {
+	taskTitle: string;
+	command: string;
 };
+
+/** Parses CLI input into tasks. Searches for custom names for the task title, defaulting to the first word of a command. */
+export const parseInput = (input: string[]) => input.map(task => {
+	// TODO: use regex?
+	const [taskTitle, ...command] = task.split(":");
+	const isNamedTask = command.length > 0;
+
+	if (isNamedTask) {
+		return { taskTitle, command: command.join(":") };
+	}
+
+	const [commandName] = task.split(" ", 1);
+	return { taskTitle: commandName, command: task };
+});
 
 /**
  * Trims command output if it only contains one non-empty line.

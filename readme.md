@@ -25,24 +25,39 @@ yarn add -D listr-cli
 ## Usage
 
 ```sh
-$ listr <command> […]
+$ npx listr [title:]<command> […]
 ```
 
 Commands should be space-separated. Commands with spaces in them must be surrounded by quotes.
 
 Equivalent to `command1 && command2 && …`.
 
-### Options
+### Named Tasks
 
-#### `--all-optional`
-
-Continue executing tasks if one fails. *(default: exit)*
+Tasks can be pre-fixed with a custom name. By default, task titles use the first word of a command.
 
 <details>
 <summary>Example</summary>
 
 ```sh
-$ npx listr xo 'ava --tap | node parse.js' tsd --all-optional
+$ listr lint:xo tsd
+✔ lint [5s]
+✔ tsd [2s]
+```
+
+</details>
+
+### Options
+
+#### `--all-optional`
+
+Continue executing tasks if one fails. By default, the task list will cancel early.
+
+<details>
+<summary>Example</summary>
+
+```sh
+$ listr xo 'ava --tap | node parse.js' tsd --all-optional
 ✔ xo [2s]
 ✖ ava
   › Passed: 10, Failed: 2
@@ -53,7 +68,7 @@ $ npx listr xo 'ava --tap | node parse.js' tsd --all-optional
 
 #### `--hide-timer`
 
-Disable showing successful task durations. *(default: show)*
+Disable showing successful task durations. By default, durations are shown.
 
 <details>
 <summary>Example</summary>

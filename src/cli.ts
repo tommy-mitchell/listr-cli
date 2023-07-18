@@ -2,11 +2,12 @@
 import process from "node:process";
 import meow from "meow";
 import { $ } from "execa";
+import { parseInput } from "./helpers.js";
 import { getTasks } from "./tasks.js";
 
 const cli = meow(`
 	Usage
-	  $ listr <command> […]
+	  $ listr [title:]<command> […]
 
 	  Commands should be space-separated. Commands with spaces in them must be surrounded by quotes.
 
@@ -18,8 +19,8 @@ const cli = meow(`
 	  --environment, --env, -e  Set environment variables via process.env.
 
 	Examples
-	  Run test commands in order
-	  $ listr xo 'c8 ava'
+	  Run named test commands in order
+	  $ listr lint:xo 'tests and coverage':'c8 ava'
 
 	  Run commands that can fail
 	  $ listr xo ava tsd --all-optional
@@ -54,9 +55,9 @@ const cli = meow(`
 	},
 });
 
-const { input: commands, flags: { help: helpShortFlag } } = cli;
+const { input, flags: { help: helpShortFlag } } = cli;
 
-if (commands.length === 0 || helpShortFlag) {
+if (input.length === 0 || helpShortFlag) {
 	cli.showHelp(0);
 }
 
@@ -72,7 +73,7 @@ if (environment) {
 }
 
 const tasks = getTasks({
-	commands,
+	commands: parseInput(input),
 	exitOnError: !allOptional,
 	showTimer: !hideTimer,
 });
