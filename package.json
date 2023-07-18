@@ -46,7 +46,7 @@
 	"dependencies": {
 		"ci-info": "^3.8.0",
 		"execa": "^7.1.1",
-		"listr2": "^5.0.8",
+		"listr2": "^6.6.0",
 		"meow": "^12.0.1"
 	},
 	"devDependencies": {
