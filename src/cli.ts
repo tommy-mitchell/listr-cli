@@ -28,7 +28,7 @@ const cli = meow(`
 	flags: {
 		help: {
 			type: "boolean",
-			alias: "h",
+			shortFlag: "h",
 		},
 		allOptional: {
 			type: "boolean",
@@ -59,12 +59,7 @@ const $$ = $({
 	shell: true,
 	reject: false,
 	all: true,
-	// Keep command output formatting
-	stripFinalNewline: false,
-	env: {
-		// https://github.com/sindresorhus/execa/issues/69#issuecomment-278693026
-		FORCE_COLOR: "true", // eslint-disable-line @typescript-eslint/naming-convention
-	},
+	stripFinalNewline: false, // Keep command output formatting
 });
 
 await tasks.run({ $$ }).catch(() => process.exit(1));

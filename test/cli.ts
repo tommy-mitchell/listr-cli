@@ -47,7 +47,8 @@ const trueCliLines = [
 	"[STARTED] node",
 	`[TITLE] Running "${trueCommand}"...`,
 	"[TITLE] node",
-	"[SUCCESS] node",
+	"",
+	"[COMPLETED] node",
 ];
 
 const falseCliLines = [
@@ -64,8 +65,8 @@ test("task reports command output", cliPasses, "echo hello", [
 	"[STARTED] echo",
 	"[TITLE] Running \"echo hello\"...",
 	"[TITLE] echo",
-	"[DATA] hello",
-	"[SUCCESS] echo",
+	"[OUTPUT] hello",
+	"[COMPLETED] echo",
 ]);
 
 test("task title changes when running: one-word", cliFails, falseCommand, falseCliLines);
@@ -74,7 +75,8 @@ test("task title changes when running: multi-word", cliPasses, "sleep 1", [
 	"[STARTED] sleep",
 	"[TITLE] Running \"sleep 1\"...",
 	"[TITLE] sleep",
-	"[SUCCESS] sleep",
+	"",
+	"[COMPLETED] sleep",
 ]);
 
 test("reports when command not found", cliFails, "tsd", [
@@ -93,12 +95,13 @@ test("successfully runs multiple commands", cliPasses, ["sleep 1", "echo 2"], [
 	"[STARTED] sleep",
 	"[TITLE] Running \"sleep 1\"...",
 	"[TITLE] sleep",
-	"[SUCCESS] sleep",
+	"",
+	"[COMPLETED] sleep",
 	"[STARTED] echo",
 	"[TITLE] Running \"echo 2\"...",
 	"[TITLE] echo",
-	"[DATA] 2",
-	"[SUCCESS] echo",
+	"[OUTPUT] 2",
+	"[COMPLETED] echo",
 ]);
 
 test("fails early if a command fails", cliFails, [trueCommand, falseCommand, "echo 2"], [
@@ -119,55 +122,55 @@ test("commands can have shell symbols in them", cliPasses, `${trueCommand} && ec
 	"[STARTED] node",
 	`[TITLE] Running "${trueCommand} && echo 2"...`,
 	"[TITLE] node",
-	"[DATA] 2",
-	"[SUCCESS] node",
+	"[OUTPUT] 2",
+	"[COMPLETED] node",
 ]);
 
 test("commands with only one non-empty line output are trimmed", cliPasses, "echo '' && echo hello", [
 	"[STARTED] echo",
 	"[TITLE] Running \"echo '' && echo hello\"...",
 	"[TITLE] echo",
-	"[DATA] hello",
-	"[SUCCESS] echo",
+	"[OUTPUT] hello",
+	"[COMPLETED] echo",
 ]);
 
 test("commands with multiline outputs aren't trimmed", cliPasses, "node -e '[...Array(5).keys()].forEach(i => console.log(i))'", [
 	"[STARTED] node",
 	"[TITLE] Running \"node -e '[...Array(5).keys()].forEach(i => console.log(i))'\"...",
 	"[TITLE] node",
-	"[DATA] 0",
-	"[DATA] 1",
-	"[DATA] 2",
-	"[DATA] 3",
-	"[DATA] 4",
-	"[DATA]",
-	"[SUCCESS] node",
+	"[OUTPUT] 0",
+	"[OUTPUT] 1",
+	"[OUTPUT] 2",
+	"[OUTPUT] 3",
+	"[OUTPUT] 4",
+	"",
+	"[COMPLETED] node",
 ]);
 
 test("outputs stdout", cliPasses, "node -e 'console.log(true)'", [
 	"[STARTED] node",
 	"[TITLE] Running \"node -e 'console.log(true)'\"...",
 	"[TITLE] node",
-	"[DATA] true",
-	"[SUCCESS] node",
+	"[OUTPUT] true",
+	"[COMPLETED] node",
 ]);
 
 test("outputs stderr", cliPasses, "node -e 'console.error(false)'", [
 	"[STARTED] node",
 	"[TITLE] Running \"node -e 'console.error(false)'\"...",
 	"[TITLE] node",
-	"[DATA] false",
-	"[SUCCESS] node",
+	"[OUTPUT] false",
+	"[COMPLETED] node",
 ]);
 
 test("outputs stdout and stderr", cliPasses, "node -e 'console.log(true); console.error(false)'", [
 	"[STARTED] node",
 	"[TITLE] Running \"node -e 'console.log(true); console.error(false)'\"...",
 	"[TITLE] node",
-	"[DATA] true",
-	"[DATA] false",
-	"[DATA]",
-	"[SUCCESS] node",
+	"[OUTPUT] true",
+	"[OUTPUT] false",
+	"",
+	"[COMPLETED] node",
 ]);
 
 // eslint-disable-next-line no-return-assign
@@ -200,3 +203,5 @@ test("running without arguments displays help text", cliPasses, "", helpText);
 test("flags: -h", cliPasses, "-h", helpText);
 
 test.todo("verify help text indentation is consistent");
+
+test.todo("task output displays color");

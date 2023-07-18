@@ -1,4 +1,5 @@
-import { Listr, type ListrTask } from "listr2";
+import process from "node:process";
+import { Listr, PRESET_TIMER, type ListrTask } from "listr2";
 import { $, type ExecaReturnValue } from "execa";
 import { isCI } from "ci-info";
 import { parseCommand, trimIfNeeded } from "./helpers.js";
@@ -59,15 +60,23 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 		},
 	} satisfies ListrTask<ListrContext>));
 
-	return new Listr<ListrContext>(tasks, {
+	return new Listr<ListrContext, "default", "verbose">(tasks, {
 		exitOnError,
-		collectErrors: false,
+		forceColor: true,
 		rendererOptions: {
-			showTimer,
+			timer: {
+				...PRESET_TIMER,
+				condition: showTimer,
+			},
 			collapseErrors: false,
 			formatOutput: "wrap",
 			removeEmptyLines: false,
 		},
-		rendererSilent: isCI,
+		silentRendererCondition: isCI,
+		fallbackRenderer: "verbose",
+		fallbackRendererCondition: process.env["NODE_ENV"] === "test",
+		fallbackRendererOptions: {
+			logTitleChange: true,
+		},
 	});
 };
