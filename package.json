@@ -34,11 +34,20 @@
 		"test": "xo && tsc --noEmit && c8 yarn run:ava",
 		"run:ava": "NODE_OPTIONS='--loader=tsx --no-warnings=ExperimentalWarning' ava"
 	},
+	"ava": {
+		"files": [
+			"test/*.ts"
+		],
+		"extensions": {
+			"ts": "module"
+		},
+		"timeout": "1m"
+	},
 	"dependencies": {
 		"ci-info": "^3.8.0",
 		"execa": "^7.1.1",
 		"listr2": "^5.0.8",
-		"meow": "^11.0.0"
+		"meow": "^12.0.1"
 	},
 	"devDependencies": {
 		"@johnowennixon/chmodx": "^1.1.0",
@@ -54,14 +63,5 @@
 		"tsx": "^3.12.7",
 		"typescript": "~5.1.6",
 		"xo": "^0.54.2"
-	},
-	"ava": {
-		"files": [
-			"test/*.ts"
-		],
-		"extensions": {
-			"ts": "module"
-		},
-		"timeout": "1m"
 	}
 }

@@ -28,7 +28,7 @@ const cli = meow(`
 	flags: {
 		help: {
 			type: "boolean",
-			alias: "h",
+			shortFlag: "h",
 		},
 		allOptional: {
 			type: "boolean",
