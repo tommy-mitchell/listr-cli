@@ -2,7 +2,7 @@
 import process from "node:process";
 import meow from "meow";
 import { $ } from "execa";
-import { parseInput } from "./helpers.js";
+import { applyEnvironmentVariables, parseInput } from "./helpers.js";
 import { getTasks } from "./tasks.js";
 
 const cli = meow(`
@@ -49,8 +49,8 @@ const cli = meow(`
 			type: "string",
 			aliases: ["env"],
 			shortFlag: "e",
-			// TODO: Disabled due to sindresorhus/meow#164
-			// isMultiple: true,
+			isMultiple: true,
+			default: [],
 		},
 	},
 });
@@ -63,14 +63,7 @@ if (input.length === 0 || helpShortFlag) {
 
 const { allOptional, hideTimer, environment } = cli.flags;
 
-if (environment) {
-	// Parse environment variables, based on https://github.com/rollup/rollup/blob/master/cli/run/index.ts#L42-L53
-	for (const pair of environment.split(",")) {
-		const [key, ...value] = pair.split(":");
-
-		process.env[key] = value.length === 0 ? String(true) : value.join(":");
-	}
-}
+applyEnvironmentVariables(environment);
 
 const tasks = getTasks({
 	commands: parseInput(input),

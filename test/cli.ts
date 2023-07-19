@@ -242,6 +242,18 @@ test("processes environment variables: -e short flag", cliPasses,
 	[`-e=${envVarsFixture.envVars}`, ...envVarsFixture.commands], envVarsFixture.output,
 );
 
+test("processes environment variables: multiple", cliPasses,
+	[`-e=${envVarsFixture.envVars}`, "--env=FIZZ", ...envVarsFixture.commands, "echo $FIZZ"],
+	[
+		...envVarsFixture.output,
+		"[STARTED] echo",
+		"[TITLE] echo: running \"echo $FIZZ\"...",
+		"[TITLE] echo",
+		"[OUTPUT] true",
+		"[COMPLETED] echo",
+	],
+);
+
 test("supports custom task names", cliPasses, [`pass:${trueCommand}`, `fail:${falseCommand}`, "--all-optional"], [
 	"[STARTED] pass",
 	"[TITLE] pass: running \"node -e 'process.exit(0)'\"...",
