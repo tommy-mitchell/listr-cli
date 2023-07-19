@@ -2,7 +2,7 @@
 import process from "node:process";
 import meow from "meow";
 import { $ } from "execa";
-import { applyEnvironmentVariables, parseInput } from "./helpers/index.js";
+import { applyEnvironmentVariables, getCommands } from "./helpers/index.js";
 import { getTasks } from "./tasks.js";
 
 const cli = meow(`
@@ -66,7 +66,7 @@ const { allOptional, hideTimer, environment } = cli.flags;
 applyEnvironmentVariables(environment);
 
 const tasks = getTasks({
-	commands: parseInput(input),
+	commands: getCommands(input),
 	exitOnError: !allOptional,
 	showTimer: !hideTimer,
 });

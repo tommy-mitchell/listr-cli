@@ -1,5 +1,5 @@
 import test from "ava";
-import { parseInput } from "../../src/helpers/parse-input.js";
+import { getCommands } from "../../src/helpers/get-commands.js";
 
 type Command = {
 	command: string;
@@ -8,7 +8,7 @@ type Command = {
 
 const verifyCommands = test.macro((t, input: string[], commands: Command[]) => {
 	t.deepEqual(
-		parseInput(input),
+		getCommands(input),
 		commands.map(({ command, taskTitle }) => ({ taskTitle: taskTitle ?? command, command })),
 	);
 });
@@ -32,5 +32,3 @@ test("named tasks with regular tasks", verifyCommands, ["lint:xo", "ava", "echo 
 test("named tasks with : in the command", verifyCommands, ["tests:yarn run:ava:watch"], [
 	{ command: "yarn run:ava:watch", taskTitle: "tests" },
 ]);
-
-// TODO: add tests for --env

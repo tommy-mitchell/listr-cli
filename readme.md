@@ -34,7 +34,7 @@ Equivalent to `command1 && command2 && …`.
 
 ### Named Tasks
 
-Tasks can be prefixed with a custom name. By default, task titles use the first word of a command.
+Tasks can be prefixed with a custom name. Multi-word titles must be surrounded by quotes. By default, task titles use the first word of a command.
 
 <details>
 <summary>Example</summary>

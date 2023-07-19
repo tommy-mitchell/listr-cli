@@ -4,7 +4,7 @@ export type Command = {
 };
 
 /** Parses CLI input into tasks. Searches for custom names for the task title, defaulting to the first word of a command. */
-export const parseInput = (input: string[]) => input.map(task => {
+export const getCommands = (input: string[]) => input.map(task => {
 	// TODO: use regex?
 	const [taskTitle, ...command] = task.split(":");
 	const isNamedTask = command.length > 0;
