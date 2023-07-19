@@ -1,5 +1,5 @@
 import test from "ava";
-import { parseInput } from "../../src/helpers.js";
+import { parseInput } from "../../src/helpers/parse-input.js";
 
 type Command = {
 	command: string;

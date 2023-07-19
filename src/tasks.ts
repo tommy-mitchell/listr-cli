@@ -2,7 +2,7 @@ import process from "node:process";
 import { Listr, PRESET_TIMER, type ListrTask } from "listr2";
 import { $, type ExecaReturnValue } from "execa";
 import { isCI } from "ci-info";
-import { type Command, trimIfNeeded } from "./helpers.js";
+import { type Command, trimIfNeeded } from "./helpers/index.js";
 
 /**
  * Fails a task. Stops the task list if `cli.flags.allOptional`

@@ -2,7 +2,7 @@
 import process from "node:process";
 import meow from "meow";
 import { $ } from "execa";
-import { applyEnvironmentVariables, parseInput } from "./helpers.js";
+import { applyEnvironmentVariables, parseInput } from "./helpers/index.js";
 import { getTasks } from "./tasks.js";
 
 const cli = meow(`
