@@ -16,38 +16,52 @@ test.after("reapply process.env", t => {
 	process.env = t.context.originalProcessEnv;
 });
 
-test.serial("separates by ,", t => {
-	applyEnvironmentVariables(["A,B,C,D"]);
+type MacroArgs = {
+	env_Vars: string[];
+	expected: string[] | Record<string, string>;
+};
 
-	t.deepEqual(
-		Object.keys(process.env),
-		["A", "B", "C", "D"],
-	);
+const verifyEnv = test.macro((t, { env_Vars: input, expected }: MacroArgs) => {
+	applyEnvironmentVariables(input);
+
+	if (Array.isArray(expected)) {
+		t.deepEqual(Object.keys(process.env), expected);
+	} else {
+		t.deepEqual(process.env, expected);
+	}
 });
 
-test.serial("processes an array of env vars", t => {
-	applyEnvironmentVariables(["A", "B", "C", "D"]);
-
-	t.deepEqual(
-		Object.keys(process.env),
-		["A", "B", "C", "D"],
-	);
+test.serial("separates by ,", verifyEnv, {
+	env_Vars: ["A,B,C,D"],
+	expected: ["A", "B", "C", "D"],
 });
 
-test.serial("sets env vars without a : to true", t => {
-	applyEnvironmentVariables(["A", "B"]);
-
-	t.deepEqual(
-		process.env,
-		{ A: "true", B: "true" },
-	);
+test.serial("processes an array of env vars", verifyEnv, {
+	env_Vars: ["A", "B", "C", "D"],
+	expected: ["A", "B", "C", "D"],
 });
 
-test.serial("splits and sets env vars with a : to the split value", t => {
-	applyEnvironmentVariables(["A:foo", "B:bar"]);
+test.serial("sets env vars without a : to true", verifyEnv, {
+	env_Vars: ["A", "B"],
+	expected: { A: "true", B: "true" },
+});
 
-	t.deepEqual(
-		process.env,
-		{ A: "foo", B: "bar" },
-	);
+test.serial("splits and sets env vars with a : to the split value", verifyEnv, {
+	env_Vars: ["A:foo", "B:bar"],
+	expected: { A: "foo", B: "bar" },
+});
+
+test.serial("allows spaces in values", verifyEnv, {
+	env_Vars: ["A:foo bar"],
+	expected: { A: "foo bar" },
+});
+
+test.serial.failing("allows commas in values", verifyEnv, {
+	env_Vars: ["LIST:foo,bar,baz"],
+	expected: { LIST: "foo,bar,baz" },
+});
+
+test.serial("later values override earlier ones", verifyEnv, {
+	env_Vars: ["FOO:bar", "FOO:baz"],
+	expected: { FOO: "baz" },
 });

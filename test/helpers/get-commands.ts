@@ -32,3 +32,7 @@ test("named tasks with regular tasks", verifyCommands, ["lint:xo", "ava", "echo 
 test("named tasks with : in the command", verifyCommands, ["tests:yarn run:ava:watch"], [
 	{ command: "yarn run:ava:watch", taskTitle: "tests" },
 ]);
+
+test("allows spaces in task title and command", verifyCommands, ["run tests:ava --watch"], [
+	{ command: "ava --watch", taskTitle: "run tests" },
+]);
