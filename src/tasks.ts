@@ -75,7 +75,7 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 			removeEmptyLines: false,
 		},
 		silentRendererCondition: isCI,
-		fallbackRenderer: "verbose",
+		fallbackRenderer: "verbose", // TODO: maybe use test renderer, it can log failed states
 		fallbackRendererCondition: process.env["NODE_ENV"] === "test",
 		fallbackRendererOptions: {
 			logTitleChange: true,

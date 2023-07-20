@@ -23,14 +23,14 @@ test.before("disable CI check", () => process.env.CI = "false");
 const trim = (stdout: string) => stdout.trim().split("\n").map(line => stripAnsi(line).trim());
 
 const verifyCli = (shouldPass: boolean, setup = async () => "", teardown = async () => "") => (
-	test.macro(async (t, commands: string | string[], expectedLines: string[]) => {
+	test.macro(async (t, commands: string | string[]) => {
 		await setup();
 
 		const args = commands ? [commands].flat() : undefined;
 		const { exitCode, stdout } = await execa(t.context.binPath, args, { reject: false });
 		const receivedLines = trim(stdout);
 
-		t.deepEqual(receivedLines, expectedLines, "CLI output different than expectations!");
+		t.snapshot(receivedLines, "CLI output");
 		t.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
 
 		await teardown();
@@ -57,157 +57,49 @@ const falseCliLines = [
 	"[TITLE] node",
 ];
 
-test("main", cliPasses, trueCommand, trueCliLines);
+test("main", cliPasses, trueCommand);
 
-test("fails", cliFails, falseCommand, falseCliLines);
+test("fails", cliFails, falseCommand);
 
-test("task reports command output", cliPasses, "echo hello", [
-	"[STARTED] echo",
-	"[TITLE] echo: running \"echo hello\"...",
-	"[TITLE] echo",
-	"[OUTPUT] hello",
-	"[COMPLETED] echo",
-]);
+test("task reports command output", cliPasses, "echo hello");
 
-test("task title changes when running: one-word", cliFails, falseCommand, falseCliLines);
+test("task title changes when running: one-word", cliFails, falseCommand);
 
-test("task title changes when running: multi-word", cliPasses, "sleep 1", [
-	"[STARTED] sleep",
-	"[TITLE] sleep: running \"sleep 1\"...",
-	"[TITLE] sleep",
-	"",
-	"[COMPLETED] sleep",
-]);
+test("task title changes when running: multi-word", cliPasses, "sleep 1");
 
-test("reports when command not found", cliFails, "tsd", [
-	"[STARTED] tsd",
-	"[TITLE] tsd: running \"tsd\"...",
-	"[TITLE] tsd: command not found.",
-]);
+test("reports when command not found", cliFails, "tsd");
 
-test("reports when multi-word command not found", cliFails, "foobar hello", [
-	"[STARTED] foobar",
-	"[TITLE] foobar: running \"foobar hello\"...",
-	"[TITLE] foobar: command \"foobar hello\" not found.",
-]);
+test("reports when multi-word command not found", cliFails, "foobar hello");
 
-test("successfully runs multiple commands", cliPasses, ["sleep 1", "echo 2"], [
-	"[STARTED] sleep",
-	"[TITLE] sleep: running \"sleep 1\"...",
-	"[TITLE] sleep",
-	"",
-	"[COMPLETED] sleep",
-	"[STARTED] echo",
-	"[TITLE] echo: running \"echo 2\"...",
-	"[TITLE] echo",
-	"[OUTPUT] 2",
-	"[COMPLETED] echo",
-]);
+test("successfully runs multiple commands", cliPasses, ["sleep 1", "echo 2"]);
 
-test("fails early if a command fails", cliFails, [trueCommand, falseCommand, "echo 2"], [
-	...trueCliLines,
-	...falseCliLines,
-]);
+test("fails early if a command fails", cliFails, [trueCommand, falseCommand, "echo 2"]);
 
-test("flags: --all-optional", cliPasses, [falseCommand, trueCommand, falseCommand, "--all-optional"], [
-	...falseCliLines,
-	...trueCliLines,
-	...falseCliLines,
-]);
+test("flags: --all-optional", cliPasses, [falseCommand, trueCommand, falseCommand, "--all-optional"]);
 
 test.todo("flags: --hide-timer");
 test.todo("only show timer for succesful commands");
 
-test("commands can have shell symbols in them", cliPasses, `${trueCommand} && echo 2`, [
-	"[STARTED] node",
-	`[TITLE] node: running "${trueCommand} && echo 2"...`,
-	"[TITLE] node",
-	"[OUTPUT] 2",
-	"[COMPLETED] node",
-]);
+test("commands can have shell symbols in them", cliPasses, `${trueCommand} && echo 2`);
 
-test("commands with only one non-empty line output are trimmed", cliPasses, "echo '' && echo hello", [
-	"[STARTED] echo",
-	"[TITLE] echo: running \"echo '' && echo hello\"...",
-	"[TITLE] echo",
-	"[OUTPUT] hello",
-	"[COMPLETED] echo",
-]);
+test("commands with only one non-empty line output are trimmed", cliPasses, "echo '' && echo hello");
 
-test("commands with multiline outputs aren't trimmed", cliPasses, "node -e '[...Array(5).keys()].forEach(i => console.log(i))'", [
-	"[STARTED] node",
-	"[TITLE] node: running \"node -e '[...Array(5).keys()].forEach(i => console.log(i))'\"...",
-	"[TITLE] node",
-	"[OUTPUT] 0",
-	"[OUTPUT] 1",
-	"[OUTPUT] 2",
-	"[OUTPUT] 3",
-	"[OUTPUT] 4",
-	"",
-	"[COMPLETED] node",
-]);
+test("commands with multiline outputs aren't trimmed", cliPasses, "node -e '[...Array(5).keys()].forEach(i => console.log(i))'");
 
-test("outputs stdout", cliPasses, "node -e 'console.log(true)'", [
-	"[STARTED] node",
-	"[TITLE] node: running \"node -e 'console.log(true)'\"...",
-	"[TITLE] node",
-	"[OUTPUT] true",
-	"[COMPLETED] node",
-]);
+test("outputs stdout", cliPasses, "node -e 'console.log(true)'");
 
-test("outputs stderr", cliPasses, "node -e 'console.error(false)'", [
-	"[STARTED] node",
-	"[TITLE] node: running \"node -e 'console.error(false)'\"...",
-	"[TITLE] node",
-	"[OUTPUT] false",
-	"[COMPLETED] node",
-]);
+test("outputs stderr", cliPasses, "node -e 'console.error(false)'");
 
-test("outputs stdout and stderr", cliPasses, "node -e 'console.log(true); console.error(false)'", [
-	"[STARTED] node",
-	"[TITLE] node: running \"node -e 'console.log(true); console.error(false)'\"...",
-	"[TITLE] node",
-	"[OUTPUT] true",
-	"[OUTPUT] false",
-	"",
-	"[COMPLETED] node",
-]);
+test("outputs stdout and stderr", cliPasses, "node -e 'console.log(true); console.error(false)'");
 
 // eslint-disable-next-line no-return-assign
 const cliPassesCi = verifyCli(true, async () => process.env.CI = "true", async () => process.env.CI = "false");
 
-test.serial("uses silent renderer in CI", cliPassesCi, "node -e 'console.log(true)'", ["true"]);
+test.serial("uses silent renderer in CI", cliPassesCi, "node -e 'console.log(true)'");
 
-// TODO: should this be a snapshot?
-const helpText = [
-	"Usage",
-	"$ listr [title:]<command> […]",
-	"",
-	"Commands should be space-separated. Commands with spaces in them must be surrounded by quotes.",
-	"",
-	"Equivalent to 'command1 && command2 && …'.",
-	"",
-	"Options",
-	"--all-optional            Continue executing tasks if one fails.      [default: exit]",
-	"--hide-timer              Disable showing successful task durations.  [default: show]",
-	"--environment, --env, -e  Set environment variables via process.env.",
-	"",
-	"Examples",
-	"Run named test commands in order",
-	"$ listr lint:xo 'tests and coverage':'c8 ava'",
-	"",
-	"Run commands that can fail",
-	"$ listr xo ava tsd --all-optional",
-	"",
-	"Set environment variables",
-	"$ listr ava --env CI,NODE_OPTIONS:'--loader=tsx'",
-	"#=> process.env.CI = \"true\"",
-	"#=> process.env.NODE_OPTIONS = \"--loader=tsx\"",
-];
+test("running without arguments displays help text", cliPasses, "");
 
-test("running without arguments displays help text", cliPasses, "", helpText);
-
-test("flags: -h", cliPasses, "-h", helpText);
+test("flags: -h", cliPasses, "-h");
 
 test.todo("verify help text indentation is consistent");
 
@@ -216,51 +108,24 @@ test.todo("task output displays color");
 const envVarsFixture = {
 	envVars: "FOO,BAR:baz",
 	commands: ["echo $FOO", "echo $BAR"],
-	output: [
-		"[STARTED] echo",
-		"[TITLE] echo: running \"echo $FOO\"...",
-		"[TITLE] echo",
-		"[OUTPUT] true",
-		"[COMPLETED] echo",
-		"[STARTED] echo",
-		"[TITLE] echo: running \"echo $BAR\"...",
-		"[TITLE] echo",
-		"[OUTPUT] baz",
-		"[COMPLETED] echo",
-	],
 };
 
 test("processes environment variables", cliPasses,
-	[`--environment=${envVarsFixture.envVars}`, ...envVarsFixture.commands], envVarsFixture.output,
+	[`--environment=${envVarsFixture.envVars}`, ...envVarsFixture.commands],
 );
 
 test("processes environment variables: --env alias", cliPasses,
-	[`--env=${envVarsFixture.envVars}`, ...envVarsFixture.commands], envVarsFixture.output,
+	[`--env=${envVarsFixture.envVars}`, ...envVarsFixture.commands],
 );
 
 test("processes environment variables: -e short flag", cliPasses,
-	[`-e=${envVarsFixture.envVars}`, ...envVarsFixture.commands], envVarsFixture.output,
+	[`-e=${envVarsFixture.envVars}`, ...envVarsFixture.commands],
 );
 
 test("processes environment variables: multiple", cliPasses,
 	[`-e=${envVarsFixture.envVars}`, "--env=FIZZ", ...envVarsFixture.commands, "echo $FIZZ"],
-	[
-		...envVarsFixture.output,
-		"[STARTED] echo",
-		"[TITLE] echo: running \"echo $FIZZ\"...",
-		"[TITLE] echo",
-		"[OUTPUT] true",
-		"[COMPLETED] echo",
-	],
 );
 
-test("supports custom task names", cliPasses, [`pass:${trueCommand}`, `fail:${falseCommand}`, "--all-optional"], [
-	"[STARTED] pass",
-	"[TITLE] pass: running \"node -e 'process.exit(0)'\"...",
-	"[TITLE] pass",
-	"",
-	"[COMPLETED] pass",
-	"[STARTED] fail",
-	"[TITLE] fail: running \"node -e 'process.exit(1)'\"...",
-	"[TITLE] fail",
-]);
+test("supports custom task names", cliPasses,
+	[`pass:${trueCommand}`, `fail:${falseCommand}`, "--all-optional"],
+);
