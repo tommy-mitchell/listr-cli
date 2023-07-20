@@ -30,7 +30,7 @@ const verifyCli = (shouldPass: boolean, setup = async () => "", teardown = async
 		const { exitCode, stdout } = await execa(t.context.binPath, args, { reject: false });
 		const receivedLines = trim(stdout);
 
-		t.snapshot(receivedLines, "CLI output");
+		t.snapshot(receivedLines, "CLI output different than expectations!");
 		t.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
 
 		await teardown();
