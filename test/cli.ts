@@ -30,9 +30,16 @@ const verifyCli = (shouldPass: boolean, setup = async () => "", teardown = async
 		const { exitCode, stdout } = await execa(t.context.binPath, args, { reject: false });
 		const receivedLines = trim(stdout);
 
-		t.snapshot(receivedLines, "CLI output different than expectations!");
-		t.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
+		const assertions = await t.try(tt => {
+			tt.snapshot(receivedLines, "CLI output different than expectations!");
+			tt.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
+		});
 
+		if (!assertions.passed) {
+			t.log("commands:", args);
+		}
+
+		assertions.commit();
 		await teardown();
 	})
 );
@@ -42,20 +49,6 @@ const cliFails = verifyCli(false);
 
 const trueCommand = "node -e 'process.exit(0)'";
 const falseCommand = "node -e 'process.exit(1)'";
-
-const trueCliLines = [
-	"[STARTED] node",
-	`[TITLE] node: running "${trueCommand}"...`,
-	"[TITLE] node",
-	"",
-	"[COMPLETED] node",
-];
-
-const falseCliLines = [
-	"[STARTED] node",
-	`[TITLE] node: running "${falseCommand}"...`,
-	"[TITLE] node",
-];
 
 test("main", cliPasses, trueCommand);
 
