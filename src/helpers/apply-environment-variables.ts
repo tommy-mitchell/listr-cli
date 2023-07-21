@@ -1,14 +1,5 @@
 import process from "node:process";
-
-type RegExpGroups<Groups extends string, Alternates extends string> = IterableIterator<(
-	RegExpMatchArray & {
-		groups: (
-			| { [name in Groups]: string }
-			| { [name in Alternates]?: string }
-			| Record<string, string>
-		);
-	}
-)>;
+import type { MatchAll } from "./types.js";
 
 /**
  * https://regex101.com/r/PLDcEt/1
@@ -41,7 +32,7 @@ const environmentVariableRegex = /(?=[^,])(?<env>[^:,]*)(?::["'](?<quoted>[^"']*
  */
 export const applyEnvironmentVariables = (environment: string[]) => {
 	for (const argument of environment) {
-		const pairs = argument.matchAll(environmentVariableRegex) as RegExpGroups<"env", "quoted" | "value">;
+		const pairs = argument.matchAll(environmentVariableRegex) as MatchAll<"env", "quoted" | "value">;
 
 		for (const pair of pairs) {
 			const key = pair.groups.env;

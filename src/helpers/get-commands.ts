@@ -1,14 +1,9 @@
+import type { Match } from "./types.js";
+
 export type Command = {
 	taskTitle: string;
 	command: string;
 };
-
-type RegExpGroups<T extends string> = (
-	| (RegExpMatchArray & {
-		groups: { [name in T]: string } | Record<string, string>;
-	})
-	| null // eslint-disable-line @typescript-eslint/ban-types
-);
 
 /** @see https://regex101.com/r/zhFo8i/1 */
 const commandRegex = /(?<title>[^:]*):(?<command>.*)/;
@@ -27,7 +22,7 @@ const commandRegex = /(?<title>[^:]*):(?<command>.*)/;
  * ]
  */
 export const getCommands = (input: string[]) => input.map(task => {
-	const command = task.match(commandRegex) as RegExpGroups<"title" | "command">;
+	const command = task.match(commandRegex) as Match<"title" | "command">;
 	const isNamedTask = command !== null;
 
 	if (isNamedTask) {
