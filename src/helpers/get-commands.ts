@@ -18,21 +18,15 @@ const commandRegex = /(?<title>[^:]*):(?<command>.*)/;
  * defaulting to the first word of a command.
  *
  * @example
- * ```
  * getCommands(["lint:xo", "tsd", "coverage and tests:c8 ava"]);
  *
- * ```
- *
- * ```
  * [
  * 	{ taskTitle: "lint",               command: "xo"     },
  * 	{ taskTitle: "tsd",                command: "tsd"    },
  * 	{ taskTitle: "coverage and tests", command: "c8 ava" },
  * ]
- * ```
  */
 export const getCommands = (input: string[]) => input.map(task => {
-	// eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
 	const command = task.match(commandRegex) as RegExpGroups<"title" | "command">;
 	const isNamedTask = command !== null;
 

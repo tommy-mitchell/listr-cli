@@ -31,7 +31,7 @@ const verifyEnv = test.macro((t, { env_Vars: input, expected }: MacroArgs) => {
 	}
 });
 
-test.serial("separates by ,", verifyEnv, {
+test.serial("separates by comma", verifyEnv, {
 	env_Vars: ["A,B,C,D"],
 	expected: ["A", "B", "C", "D"],
 });
@@ -56,12 +56,22 @@ test.serial("allows spaces in values", verifyEnv, {
 	expected: { A: "foo bar" },
 });
 
-test.serial.failing("allows commas in values", verifyEnv, {
-	env_Vars: ["LIST:foo,bar,baz"],
-	expected: { LIST: "foo,bar,baz" },
-});
-
 test.serial("later values override earlier ones", verifyEnv, {
 	env_Vars: ["FOO:bar", "FOO:baz"],
 	expected: { FOO: "baz" },
+});
+
+test.serial("allows commas in values if quoted: double quotes", verifyEnv, {
+	env_Vars: ["LIST:\"foo,bar, baz\""],
+	expected: { LIST: "foo,bar, baz" },
+});
+
+test.serial("allows commas in values if quoted: single quotes", verifyEnv, {
+	env_Vars: ["LIST:'foo,bar, baz'"],
+	expected: { LIST: "foo,bar, baz" },
+});
+
+test.serial("allows double or single quotes, separates by comma, sets to true or split value", verifyEnv, {
+	env_Vars: ["FOO", "BAR,LIST:\"a,b,c\",FOO,BAR:'baz'", "FIZZ:buzz bazz"],
+	expected: { FOO: "true", BAR: "baz", LIST: "a,b,c", FIZZ: "buzz bazz" },
 });

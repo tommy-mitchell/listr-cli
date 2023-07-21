@@ -14,7 +14,8 @@
 				"@typescript-eslint/quotes": ["error", "double"],
 				"@typescript-eslint/object-curly-spacing": ["error", "always"],
 				"@typescript-eslint/no-confusing-void-expression": ["error", { "ignoreArrowShorthand": true }],
-				"n/file-extension-in-import": ["error", "always", { ".ts": "always" }]
+				"n/file-extension-in-import": ["error", "always", { ".ts": "always" }],
+				"@typescript-eslint/prefer-regexp-exec": "off"
 			}
 		}
 	]
