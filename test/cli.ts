@@ -122,3 +122,7 @@ test("processes environment variables: multiple", cliPasses,
 test("supports custom task names", cliPasses,
 	[`pass:${trueCommand}`, `fail:${falseCommand}`, "--all-optional"],
 );
+
+test("custom task names ignores quoted tasks", cliPasses,
+	["\"echo ':'\""], // TODO: single quotes
+);

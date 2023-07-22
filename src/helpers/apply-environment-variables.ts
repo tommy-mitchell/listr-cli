@@ -2,7 +2,9 @@ import process from "node:process";
 import type { MatchAll } from "./types.js";
 
 /**
- * https://regex101.com/r/PLDcEt/1
+ * Matches environment variables, including in lists.
+ *
+ * @see https://regex101.com/r/PLDcEt/1
  *
  * @example
  * 1. /(?=[^,])/                   // Skip commas
@@ -12,7 +14,6 @@ import type { MatchAll } from "./types.js";
  * 5. /:(?<value>[^,]*)/           // Second alternate: capture unquoted value (after :, anything before ,)
  */
 const environmentVariableRegex = /(?=[^,])(?<env>[^:,]*)(?::["'](?<quoted>[^"']*)["']|:(?<value>[^,]*))?/g;
-// TODO: use duplicate named capturing groups in the future - https://github.com/tc39/proposal-duplicate-named-capturing-groups
 
 /**
  * Parses environment variable input into separate values, applying them to `process.env`.

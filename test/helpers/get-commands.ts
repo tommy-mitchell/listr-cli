@@ -6,11 +6,19 @@ type Command = {
 	taskTitle?: string;
 };
 
-const verifyCommands = test.macro((t, input: string[], commands: Command[]) => {
-	t.deepEqual(
-		getCommands(input),
-		commands.map(({ command, taskTitle }) => ({ taskTitle: taskTitle ?? command, command })),
-	);
+const verifyCommands = test.macro(async (t, input: string[], commands: Command[]) => {
+	const assertion = await t.try(tt => {
+		tt.deepEqual(
+			getCommands(input),
+			commands.map(({ command, taskTitle }) => ({ taskTitle: taskTitle ?? command, command })),
+		);
+	});
+
+	if (!assertion.passed) {
+		t.log("Input:", input);
+	}
+
+	assertion.commit();
 });
 
 test("splits command name and args", verifyCommands, ["xo", "ava --tap", "tsd"], [
@@ -35,4 +43,9 @@ test("named tasks with : in the command", verifyCommands, ["tests:yarn run:ava:w
 
 test("allows spaces in task title and command", verifyCommands, ["run tests:ava --watch"], [
 	{ command: "ava --watch", taskTitle: "run tests" },
+]);
+
+test("quoted tasks are treated as unnamed", verifyCommands, ["\"yarn run:ava\"", "'yarn run:ava'"], [
+	{ command: "yarn run:ava", taskTitle: "yarn" },
+	{ command: "yarn run:ava", taskTitle: "yarn" },
 ]);
