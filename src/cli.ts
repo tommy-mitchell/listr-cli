@@ -7,7 +7,7 @@ import { getTasks } from "./tasks.js";
 
 const cli = meow(`
 	Usage
-	  $ listr [title:]<command> […]
+	  $ listr [title::]<command> […]
 
 	  Commands should be space-separated. Commands with spaces in them must be surrounded by quotes.
 
@@ -20,7 +20,7 @@ const cli = meow(`
 
 	Examples
 	  Run named test commands in order
-	  $ listr lint:xo 'tests and coverage':'c8 ava'
+	  $ listr lint::xo 'tests and coverage::c8 ava'
 
 	  Run commands that can fail
 	  $ listr xo ava tsd --all-optional

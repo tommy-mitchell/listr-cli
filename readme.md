@@ -25,7 +25,7 @@ yarn add -D listr-cli
 ## Usage
 
 ```sh
-$ npx listr [title:]<command> […]
+$ npx listr [title::]<command> […]
 ```
 
 Commands should be space-separated. Commands with spaces in them must be surrounded by quotes.
@@ -40,7 +40,7 @@ Tasks can be prefixed with a custom name. Multi-word titles must be surrounded b
 <summary>Example</summary>
 
 ```sh
-$ listr lint:xo tsd
+$ listr lint::xo tsd
 ✔ lint [5s]
 ✔ tsd [2s]
 ```

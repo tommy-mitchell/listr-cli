@@ -124,5 +124,5 @@ test("supports custom task names", cliPasses,
 );
 
 test("custom task names ignores quoted tasks", cliPasses,
-	["\"echo ':'\""], // TODO: single quotes
+	["\"echo ::\"", "'echo ::'"],
 );
