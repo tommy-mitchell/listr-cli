@@ -1,5 +1,5 @@
 import test from "ava";
-import { trimIfNeeded } from "../../src/helpers/trim-if-needed.js";
+import { trimIfNeeded } from "../../src/helpers/tasks/trim-if-needed.js";
 
 test("trims strings with a single non-empty line", t => {
 	t.is(trimIfNeeded("foo\n"), "foo");

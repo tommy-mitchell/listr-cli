@@ -1,21 +1,21 @@
 import test from "ava";
-import { getCommands } from "../../src/helpers/get-commands.js";
+import { getCommands } from "../../src/helpers/get-commands/get-commands.js";
 
 type Command = {
 	command: string;
 	taskTitle?: string;
 };
 
-const verifyCommands = test.macro(async (t, input: string[], commands: Command[]) => {
+const verifyCommands = test.macro(async (t, commands: string[], expected: Command[]) => {
 	const assertion = await t.try(tt => {
 		tt.deepEqual(
-			getCommands(input),
-			commands.map(({ command, taskTitle }) => ({ taskTitle: taskTitle ?? command, command })),
+			getCommands(commands),
+			expected.map(({ command, taskTitle }) => ({ taskTitle: taskTitle ?? command, command })),
 		);
 	});
 
 	if (!assertion.passed) {
-		t.log("Input:", input);
+		t.log("Tasks:", commands);
 	}
 
 	assertion.commit();
@@ -49,3 +49,5 @@ test("quoted tasks are treated as unnamed", verifyCommands, ["\"yarn run:ava\"",
 	{ command: "yarn run:ava", taskTitle: "yarn" },
 	{ command: "yarn run:ava", taskTitle: "yarn" },
 ]);
+
+// TODO: unify difference between commands/tasks

@@ -14,9 +14,9 @@ const cli = meow(`
 	  Equivalent to 'command1 && command2 && …'.
 
 	Options
-	  --all-optional            Continue executing tasks if one fails.      [default: exit]
-	  --hide-timer              Disable showing successful task durations.  [default: show]
-	  --environment, --env, -e  Set environment variables via process.env.
+	  --all-optional            Continue executing tasks if one fails      [default: exit]
+	  --hide-timer              Disable showing successful task durations  [default: show]
+	  --environment, --env, -e  Set environment variables via process.env
 
 	Examples
 	  Run named test commands in order
