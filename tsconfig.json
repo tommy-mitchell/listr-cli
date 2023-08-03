@@ -4,6 +4,7 @@
 	"include": ["src"],
 	"compilerOptions": {
 		"outDir": "dist",
-		"declaration": false
+		"declaration": false,
+		"removeComments": true,
 	},
 }

@@ -2,7 +2,7 @@ import process from "node:process";
 import { Listr, PRESET_TIMER, type ListrTask } from "listr2";
 import { $, type ExecaReturnValue } from "execa";
 import { isCI } from "ci-info";
-import { parseCommand, trimIfNeeded } from "./helpers.js";
+import { type Command, trimIfNeeded } from "./helpers/index.js";
 
 /**
  * Fails a task. Stops the task list if `cli.flags.allOptional`
@@ -19,46 +19,48 @@ type ListrContext = {
 };
 
 type TaskContext = {
-	commands: string[];
+	commands: Command[];
 	exitOnError: boolean;
 	showTimer: boolean;
 };
 
 export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
-	const tasks = commands.map(command => ({
-		title: parseCommand(command),
-		// @ts-expect-error: return works
-		task: async ({ $$ }, task) => {
-			if(isCI) {
-				return $({ shell: true, stdio: "inherit" })`${command}`;
-			}
+	const tasks: Array<ListrTask<ListrContext>> = [];
 
-			const [commandName, args] = parseCommand(command, { getArgs: true });
+	for (const { taskTitle, command } of commands) {
+		tasks.push({
+			title: taskTitle,
+			// @ts-expect-error: return works
+			task: async ({ $$ }, task) => {
+				if (isCI) {
+					return $({ shell: true, stdio: "inherit" })`${command}`;
+				}
 
-			task.title = `Running "${command}"...`;
+				task.title += `: running "${command}"...`;
 
-			const { exitCode, all, message } = await $$`${commandName} ${args}` as ExecaReturnValue & { all: string; message: string };
+				const { exitCode, all, message } = await $$`${command}` as ExecaReturnValue & { all: string; message: string };
 
-			if(exitCode === 127 || message?.includes("ENOENT")) {
-				task.title = commandName === command
-					? `${commandName}: command not found.`
-					: `${commandName}: command "${command}" not found.`;
+				if (exitCode === 127 || message?.includes("ENOENT")) {
+					task.title = taskTitle === command
+						? `${taskTitle}: command not found.`
+						: `${taskTitle}: command "${command}" not found.`;
 
-				endTask();
-			}
+					endTask();
+				}
 
-			task.title = commandName;
+				task.title = taskTitle;
 
-			if(exitCode !== 0) {
-				endTask(trimIfNeeded(all));
-			}
+				if (exitCode !== 0) {
+					endTask(trimIfNeeded(all));
+				}
 
-			task.output = trimIfNeeded(all);
-		},
-		options: {
-			persistentOutput: true,
-		},
-	} satisfies ListrTask<ListrContext>));
+				task.output = trimIfNeeded(all);
+			},
+			options: {
+				persistentOutput: true,
+			},
+		});
+	}
 
 	return new Listr<ListrContext, "default", "verbose">(tasks, {
 		exitOnError,
@@ -73,7 +75,7 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 			removeEmptyLines: false,
 		},
 		silentRendererCondition: isCI,
-		fallbackRenderer: "verbose",
+		fallbackRenderer: "verbose", // TODO: maybe use test renderer, it can log failed states
 		fallbackRendererCondition: process.env["NODE_ENV"] === "test",
 		fallbackRendererOptions: {
 			logTitleChange: true,
