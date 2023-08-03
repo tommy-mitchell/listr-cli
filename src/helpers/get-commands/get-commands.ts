@@ -8,8 +8,8 @@ import { parseUnnamedCommand } from "./parse-unnamed-command.js";
  * quotes (single or double), it's treated as an unnamed task.
  *
  * @example
- * // listr lint:xo tsd 'coverage and tests:c8 ava' '"yarn run:tests"'
- * getCommands(["lint:xo", "tsd", "coverage and tests:c8 ava", "\"yarn run:tests\""]);
+ * // listr lint::xo tsd 'coverage and tests::c8 ava' '"yarn run:tests"'
+ * getCommands(["lint::xo", "tsd", "coverage and tests::c8 ava", "\"yarn run:tests\""]);
  *
  * [
  * 	{ taskTitle: "lint",               command: "xo"             },
