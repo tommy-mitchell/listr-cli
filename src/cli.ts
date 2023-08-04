@@ -15,7 +15,7 @@ const cli = meow(`
 	  Equivalent to 'command1 && command2 && …'.
 
 	Options
-	  --all-optional            Continue executing tasks if one fails      [default: exit]
+	  --all-optional, --opt     Continue executing tasks if one fails      [default: exit]
 	  --hide-timer              Disable showing successful task durations  [default: show]
 	  --environment, --env, -e  Set environment variables via process.env
 
@@ -40,6 +40,7 @@ const cli = meow(`
 		},
 		allOptional: {
 			type: "boolean",
+			aliases: ["opt"],
 			default: false,
 		},
 		hideTimer: {

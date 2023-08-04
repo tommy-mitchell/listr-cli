@@ -49,7 +49,7 @@ $ listr lint::xo tsd
 
 ### Options
 
-#### `--all-optional`
+#### `--all-optional` (`--opt`)
 
 Continue executing tasks if one fails. By default, the task list will cancel early.
 

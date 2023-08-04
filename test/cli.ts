@@ -95,6 +95,13 @@ test("flags: --all-optional", cliPasses, [
 	"--all-optional",
 ]);
 
+test("flags: --opt", cliPasses, [
+	falseCommand,
+	trueCommand,
+	falseCommand,
+	"--opt",
+]);
+
 test.todo("flags: --hide-timer");
 test.todo("only show timer for succesful commands");
 
