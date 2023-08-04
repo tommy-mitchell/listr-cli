@@ -2,6 +2,7 @@ import process from "node:process";
 import { Listr, PRESET_TIMER, type ListrTask } from "listr2";
 import { $, type ExecaReturnValue } from "execa";
 import { isCI } from "ci-info";
+import LineTransformStream from "line-transform-stream";
 import { type Command, trimIfNeeded } from "./helpers/index.js";
 
 /**
@@ -22,12 +23,13 @@ type TaskContext = {
 	commands: Command[];
 	exitOnError: boolean;
 	showTimer: boolean;
+	persistentOutput: boolean;
 };
 
-export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
+export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput }: TaskContext) => {
 	const tasks: Array<ListrTask<ListrContext>> = [];
 
-	for (const { taskTitle, command } of commands) {
+	for (const { taskTitle, command, commandName } of commands) {
 		tasks.push({
 			title: taskTitle,
 			// @ts-expect-error: return works
@@ -37,27 +39,43 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 				}
 
 				task.title += `: running "${command}"...`;
+				const executeCommand = $$`${command}`;
 
-				const { exitCode, all, message } = await $$`${command}` as ExecaReturnValue & { all: string; message: string };
+				let commandNotFound = false;
 
-				if (exitCode === 127 || message?.includes("ENOENT")) {
-					task.title = taskTitle === command
-						? `${taskTitle}: command not found.`
-						: `${taskTitle}: command "${command}" not found.`;
+				executeCommand.all?.pipe(new LineTransformStream(line => {
+					// eslint-disable-next-line unicorn/prefer-regexp-test
+					if (line.match(new RegExp(`${commandName}.*not found`))) {
+						task.title = taskTitle === command
+							? `${taskTitle}: command not found.`
+							: `${taskTitle}: command "${command}" not found.`;
 
+						commandNotFound = true;
+						return "";
+					}
+
+					return line;
+				})).pipe(task.stdout());
+
+				const { exitCode, all } = await executeCommand as ExecaReturnValue & { all: string };
+
+				if (commandNotFound) {
 					endTask();
 				}
 
 				task.title = taskTitle;
+				const { shouldTrim, output } = trimIfNeeded(all);
 
-				if (exitCode !== 0) {
-					endTask(trimIfNeeded(all));
+				if (shouldTrim) {
+					task.output = output;
 				}
 
-				task.output = trimIfNeeded(all);
+				if (exitCode !== 0) {
+					endTask();
+				}
 			},
 			options: {
-				persistentOutput: true,
+				persistentOutput,
 			},
 		});
 	}
@@ -70,6 +88,7 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 				...PRESET_TIMER,
 				condition: showTimer,
 			},
+			showErrorMessage: false,
 			collapseErrors: false,
 			formatOutput: "wrap",
 			removeEmptyLines: false,

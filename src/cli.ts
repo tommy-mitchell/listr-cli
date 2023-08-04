@@ -14,8 +14,9 @@ const cli = meow(`
 	  Equivalent to 'command1 && command2 && …'.
 
 	Options
-	  --all-optional            Continue executing tasks if one fails      [default: exit]
 	  --hide-timer              Disable showing successful task durations  [default: show]
+	  --no-persist              Disable persisting task output             [default: show]
+	  --all-optional, --opt     Continue executing tasks if one fails      [default: exit]
 	  --environment, --env, -e  Set environment variables via process.env
 
 	Examples
@@ -37,12 +38,17 @@ const cli = meow(`
 			type: "boolean",
 			shortFlag: "h",
 		},
-		allOptional: {
+		hideTimer: {
 			type: "boolean",
 			default: false,
 		},
-		hideTimer: {
+		persist: {
 			type: "boolean",
+			default: true,
+		},
+		allOptional: {
+			type: "boolean",
+			aliases: ["opt"],
 			default: false,
 		},
 		environment: {
@@ -61,7 +67,7 @@ if (input.length === 0 || helpShortFlag) {
 	cli.showHelp(0);
 }
 
-const { allOptional, hideTimer, environment } = cli.flags;
+const { hideTimer, persist: persistentOutput, allOptional, environment } = cli.flags;
 
 applyEnvironmentVariables(environment);
 
@@ -69,6 +75,7 @@ const tasks = getTasks({
 	commands: getCommands(input),
 	exitOnError: !allOptional,
 	showTimer: !hideTimer,
+	persistentOutput,
 });
 
 const $$ = $({

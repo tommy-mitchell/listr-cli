@@ -31,7 +31,8 @@
 		"prepack": "npm run build",
 		"build": "tsc && chmodx --package",
 		"postbuild": "replace-in-files dist/cli.js --string='#!/usr/bin/env tsx' --replacement='#!/usr/bin/env node'",
-		"test": "xo && tsc --noEmit && c8 npm run ava",
+		"lint": "xo",
+		"test": "tsc --noEmit && c8 npm run ava",
 		"ava": "NODE_OPTIONS='--loader=tsx --no-warnings=ExperimentalWarning' ava"
 	},
 	"ava": {
@@ -41,7 +42,9 @@
 		"extensions": {
 			"ts": "module"
 		},
-		"timeout": "30s",
+		"environmentVariables": {
+			"concurrency": "5"
+		},
 		"nodeArguments": [
 			"--loader=tsx",
 			"--no-warnings=ExperimentalWarning"
@@ -50,16 +53,17 @@
 	"dependencies": {
 		"ci-info": "^3.8.0",
 		"execa": "^7.1.1",
+		"line-transform-stream": "^1.0.1",
 		"listr2": "^6.6.0",
 		"meow": "^12.0.1"
 	},
 	"devDependencies": {
 		"@johnowennixon/chmodx": "^1.1.0",
+		"@shopify/semaphore": "^3.0.2",
 		"@tommy-mitchell/tsconfig": "^1.1.0",
 		"@types/node": "^20.4.2",
 		"ava": "^5.3.1",
 		"c8": "^8.0.0",
-		"ci-info": "^3.8.0",
 		"get-bin-path": "^10.0.0",
 		"is-executable": "^2.0.1",
 		"replace-in-files-cli": "^2.2.0",

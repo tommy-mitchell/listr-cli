@@ -36,6 +36,7 @@ export const parseNamedCommand = (command: string): MaybeNamedCommand => {
 		command: isNamedCommand ? {
 			taskTitle: namedCommand.groups.title,
 			command: namedCommand.groups.command,
+			commandName: namedCommand.groups.command.split(" ")[0],
 		} : {},
 	} as MaybeNamedCommand;
 };

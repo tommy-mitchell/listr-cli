@@ -4,6 +4,7 @@ import { getCommands } from "../../src/helpers/get-commands/get-commands.js";
 type Command = {
 	command: string;
 	taskTitle?: string;
+	commandName?: string;
 };
 
 type MacroArgs = {
@@ -11,19 +12,20 @@ type MacroArgs = {
 	expected: Command[];
 };
 
-const verifyCommands = test.macro(async (t, { commands, expected }: MacroArgs) => {
-	const assertion = await t.try(tt => {
-		tt.deepEqual(
-			getCommands(commands),
-			expected.map(({ command, taskTitle }) => ({ taskTitle: taskTitle ?? command, command })),
-		);
-	});
+const verifyCommands = test.macro((t, { commands, expected: expectations }: MacroArgs) => {
+	for (const actual of getCommands(commands)) {
+		const expected = expectations.shift()!;
 
-	if (!assertion.passed) {
-		t.log("Tasks:", commands);
+		const passed = t.like(actual, {
+			...expected,
+			taskTitle: expected.taskTitle ?? expected.command,
+		});
+
+		if (!passed) {
+			t.log("Task:", actual);
+			t.log("Expected:", expected);
+		}
 	}
-
-	assertion.commit();
 });
 
 test("splits command name and args", verifyCommands, {
@@ -62,13 +64,23 @@ test("allows spaces in task title and command", verifyCommands, {
 	commands: ["run tests::ava --watch"],
 	expected: [
 		{ command: "ava --watch", taskTitle: "run tests" },
-	] });
+	],
+});
 
 test("quoted tasks are treated as unnamed", verifyCommands, {
 	commands: ["\"yarn run:ava\"", "'yarn run:ava'"],
 	expected: [
 		{ command: "yarn run:ava", taskTitle: "yarn" },
 		{ command: "yarn run:ava", taskTitle: "yarn" },
+	],
+});
+
+test("parses command named", verifyCommands, {
+	commands: ["lint::xo", "tests::yarn run:ava:watch", "tsd"],
+	expected: [
+		{ command: "xo", taskTitle: "lint", commandName: "xo" },
+		{ command: "yarn run:ava:watch", taskTitle: "tests", commandName: "yarn" },
+		{ command: "tsd", taskTitle: "tsd", commandName: "tsd" },
 	],
 });
 

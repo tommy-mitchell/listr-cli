@@ -1,5 +1,6 @@
 import process from "node:process";
 import anyTest, { type TestFn } from "ava";
+import { Semaphore, type Permit } from "@shopify/semaphore";
 import { execa } from "execa";
 import { getBinPath } from "get-bin-path";
 import { isExecutable } from "is-executable";
@@ -7,6 +8,7 @@ import stripAnsi from "strip-ansi";
 
 const test = anyTest as TestFn<{
 	binPath: string;
+	permit: Permit;
 }>;
 
 test.before("setup context", async t => {
@@ -20,23 +22,33 @@ test.before("setup context", async t => {
 // eslint-disable-next-line no-return-assign
 test.before("disable CI check", () => process.env.CI = "false");
 
+// https://github.com/avajs/ava/discussions/3177
+const semaphore = new Semaphore(Number(process.env.concurrency) || 5);
+
+test.beforeEach("setup concurrency", async t => {
+	t.context.permit = await semaphore.acquire();
+});
+
+test.afterEach.always(async t => {
+	await t.context.permit.release();
+});
+
 const trim = (stdout: string) => stdout.trim().split("\n").map(line => stripAnsi(line).trim());
 
 const verifyCli = (shouldPass: boolean, setup = async () => "", teardown = async () => "") => (
-	test.macro(async (t, commands: string | string[]) => {
+	test.macro(async (t, commands: string[]) => {
 		await setup();
 
-		const args = commands ? [commands].flat() : undefined;
-		const { exitCode, stdout } = await execa(t.context.binPath, args, { reject: false });
+		const { exitCode, stdout } = await execa(t.context.binPath, commands, { reject: false });
 		const receivedLines = trim(stdout);
 
 		const assertions = await t.try(tt => {
-			tt.snapshot(receivedLines, "CLI output different than expectations!");
+			tt.snapshot(receivedLines);
 			tt.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
 		});
 
 		if (!assertions.passed) {
-			t.log("commands:", args);
+			t.log("commands:", commands);
 		}
 
 		assertions.commit();
@@ -50,49 +62,98 @@ const cliFails = verifyCli(false);
 const trueCommand = "node -e 'process.exit(0)'";
 const falseCommand = "node -e 'process.exit(1)'";
 
-test("main", cliPasses, trueCommand);
+test("main", cliPasses, [
+	trueCommand,
+]);
 
-test("fails", cliFails, falseCommand);
+test("fails", cliFails, [
+	falseCommand,
+]);
 
-test("task reports command output", cliPasses, "echo hello");
+test("task reports command output", cliPasses, [
+	"echo hello",
+]);
 
-test("task title changes when running: one-word", cliFails, falseCommand);
+test("task title changes when running: one-word", cliFails, [
+	falseCommand,
+]);
 
-test("task title changes when running: multi-word", cliPasses, "sleep 1");
+test("task title changes when running: multi-word", cliPasses, [
+	"sleep 1",
+]);
 
-test("reports when command not found", cliFails, "tsd");
+test("reports when command not found", cliFails, [
+	"tsd",
+]);
 
-test("reports when multi-word command not found", cliFails, "foobar hello");
+test("reports when multi-word command not found", cliFails, [
+	"foobar hello",
+]);
 
-test("successfully runs multiple commands", cliPasses, ["sleep 1", "echo 2"]);
+test("successfully runs multiple commands", cliPasses, [
+	"sleep 1",
+	"echo 2",
+]);
 
-test("fails early if a command fails", cliFails, [trueCommand, falseCommand, "echo 2"]);
+test("fails early if a command fails", cliFails, [
+	trueCommand,
+	falseCommand,
+	"echo 2",
+]);
 
-test("flags: --all-optional", cliPasses, [falseCommand, trueCommand, falseCommand, "--all-optional"]);
+test("flags: --all-optional", cliPasses, [
+	falseCommand,
+	trueCommand,
+	falseCommand,
+	"--all-optional",
+]);
+
+test("flags: --opt", cliPasses, [
+	falseCommand,
+	trueCommand,
+	falseCommand,
+	"--opt",
+]);
 
 test.todo("flags: --hide-timer");
 test.todo("only show timer for succesful commands");
 
-test("commands can have shell symbols in them", cliPasses, `${trueCommand} && echo 2`);
+test("commands can have shell symbols in them", cliPasses, [
+	`${trueCommand} && echo 2`,
+]);
 
-test("commands with only one non-empty line output are trimmed", cliPasses, "echo '' && echo hello");
+test("commands with only one non-empty line output are trimmed", cliPasses, [
+	"echo '' && echo hello",
+]);
 
-test("commands with multiline outputs aren't trimmed", cliPasses, "node -e '[...Array(5).keys()].forEach(i => console.log(i))'");
+test("commands with multiline outputs aren't trimmed", cliPasses, [
+	"echo '0\\n1\\n2\\n3\\n4\\n'",
+]);
 
-test("outputs stdout", cliPasses, "node -e 'console.log(true)'");
+test("outputs stdout", cliPasses, [
+	"node -e 'console.log(true)'",
+]);
 
-test("outputs stderr", cliPasses, "node -e 'console.error(false)'");
+test("outputs stderr", cliPasses, [
+	"node -e 'console.error(false)'",
+]);
 
-test("outputs stdout and stderr", cliPasses, "node -e 'console.log(true); console.error(false)'");
+test("outputs stdout and stderr", cliPasses, [
+	"node -e 'console.log(true); console.error(false)'",
+]);
 
 // eslint-disable-next-line no-return-assign
 const cliPassesCi = verifyCli(true, async () => process.env.CI = "true", async () => process.env.CI = "false");
 
-test.serial("uses silent renderer in CI", cliPassesCi, "node -e 'console.log(true)'");
+test.serial("uses silent renderer in CI", cliPassesCi, [
+	"node -e 'console.log(true)'",
+]);
 
-test("running without arguments displays help text", cliPasses, "");
+test("running without arguments displays help text", cliPasses, []);
 
-test("flags: -h", cliPasses, "-h");
+test("flags: -h", cliPasses, [
+	"-h",
+]);
 
 test.todo("verify help text indentation is consistent");
 
@@ -101,28 +162,37 @@ test.todo("task output displays color");
 const envVarsFixture = {
 	envVars: "FOO,BAR:baz",
 	commands: ["echo $FOO", "echo $BAR"],
-};
+} as const;
 
-test("processes environment variables", cliPasses,
-	[`--environment=${envVarsFixture.envVars}`, ...envVarsFixture.commands],
-);
+test("processes environment variables", cliPasses, [
+	`--environment=${envVarsFixture.envVars}`,
+	...envVarsFixture.commands,
+]);
 
-test("processes environment variables: --env alias", cliPasses,
-	[`--env=${envVarsFixture.envVars}`, ...envVarsFixture.commands],
-);
+test("processes environment variables: --env alias", cliPasses, [
+	`--env=${envVarsFixture.envVars}`,
+	...envVarsFixture.commands,
+]);
 
-test("processes environment variables: -e short flag", cliPasses,
-	[`-e=${envVarsFixture.envVars}`, ...envVarsFixture.commands],
-);
+test("processes environment variables: -e short flag", cliPasses, [
+	`-e=${envVarsFixture.envVars}`,
+	...envVarsFixture.commands,
+]);
 
-test("processes environment variables: multiple", cliPasses,
-	[`-e=${envVarsFixture.envVars}`, "--env=FIZZ", ...envVarsFixture.commands, "echo $FIZZ"],
-);
+test("processes environment variables: multiple", cliPasses, [
+	`-e=${envVarsFixture.envVars}`,
+	"--env=FIZZ",
+	...envVarsFixture.commands,
+	"echo $FIZZ",
+]);
 
-test("supports custom task names", cliPasses,
-	[`pass::${trueCommand}`, `fail::${falseCommand}`, "--all-optional"],
-);
+test("supports custom task names", cliPasses, [
+	`pass::${trueCommand}`,
+	`fail::${falseCommand}`,
+	"--all-optional",
+]);
 
-test("custom task names ignores quoted tasks", cliPasses,
-	["\"echo ::\"", "'echo ::'"],
-);
+test("custom task names ignores quoted tasks", cliPasses, [
+	"\"echo ::\"",
+	"'echo ::'",
+]);

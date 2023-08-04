@@ -6,6 +6,10 @@
  */
 export const trimIfNeeded = (output: string) => {
 	const trimmed = output.trim();
+	const shouldTrim = output !== trimmed && !trimmed.includes("\n");
 
-	return trimmed.includes("\n") ? output : trimmed;
+	return {
+		shouldTrim,
+		output: shouldTrim ? trimmed : output,
+	};
 };

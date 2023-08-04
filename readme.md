@@ -4,7 +4,7 @@ Command-line task lists made pretty.
 
 <p align="center"><img src="media/demo.gif"></p>
 
-Gracefully handles and displays failures, including if a given command is not found. Allows [setting environment variables](#environment---env--e) cross-platform.
+Gracefully handles and displays failures, including if a given command is not found. Supports local binaries from `node_modules/bin` without specifying `npx`, and allows [setting environment variables](#environment---env--e) cross-platform.
 
 If used in a CI environment, command output is outputted as is.
 
@@ -18,7 +18,7 @@ npm install --save-dev listr-cli
 <summary>Other Package Managers</summary>
 
 ```sh
-yarn add -D listr-cli
+yarn add --dev listr-cli
 ```
 </details>
 
@@ -34,13 +34,13 @@ Equivalent to `command1 && command2 && …`.
 
 ### Named Tasks
 
-Tasks can be prefixed with a custom name. Multi-word titles must be surrounded by quotes. By default, task titles use the first word of a command.
+Tasks can be prefixed with a custom name, in the form `title::command`. Multi-word titles must be surrounded by quotes. By default, task titles use the first word of a command.
 
 <details>
 <summary>Example</summary>
 
 ```sh
-$ listr lint::xo tsd
+$ listr 'lint::xo --fix' tsd
 ✔ lint [5s]
 ✔ tsd [2s]
 ```
@@ -48,23 +48,6 @@ $ listr lint::xo tsd
 </details>
 
 ### Options
-
-#### `--all-optional`
-
-Continue executing tasks if one fails. By default, the task list will cancel early.
-
-<details>
-<summary>Example</summary>
-
-```sh
-$ listr xo 'ava --tap | node parse.js' tsd --all-optional
-✔ xo [2s]
-✖ ava
-  › Passed: 10, Failed: 2
-✔ tsd [2s]
-```
-
-</details>
 
 #### `--hide-timer`
 
@@ -77,6 +60,39 @@ Disable showing successful task durations. By default, durations are shown.
 $ npx listr xo tsd --hide-timer
 ✔ xo
 ✔ tsd
+```
+
+</details>
+
+#### `--no-persist`
+
+Disable persisting task output. By default, task outputs persist after completion.
+
+<details>
+<summary>Example</summary>
+
+```sh
+$ npx listr xo ava --no-persist
+✔ xo [2s]
+⠼ ava
+  › ✔ cli › main
+```
+
+</details>
+
+#### `--all-optional` (`--opt`)
+
+Continue executing tasks if one fails. By default, the task list will cancel early.
+
+<details>
+<summary>Example</summary>
+
+```sh
+$ listr xo 'ava --tap | node parse.js' tsd --all-optional
+✔ xo [2s]
+✖ ava
+  › Passed: 10, Failed: 2
+✔ tsd [2s]
 ```
 
 </details>
