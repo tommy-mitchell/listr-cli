@@ -2,6 +2,7 @@ import process from "node:process";
 import { Listr, PRESET_TIMER, type ListrTask } from "listr2";
 import { $, type ExecaReturnValue } from "execa";
 import { isCI } from "ci-info";
+import LineTransformStream from "line-transform-stream";
 import { type Command, trimIfNeeded } from "./helpers/index.js";
 
 /**
@@ -37,23 +38,22 @@ export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput }:
 					return $({ shell: true, stdio: "inherit" })`${command}`;
 				}
 
+				task.title += `: running "${command}"...`;
 				const executeCommand = $$`${command}`;
 
-				executeCommand.stdout?.pipe(task.stdout());
-				executeCommand.stderr?.pipe(task.stdout());
+				executeCommand.all?.pipe(new LineTransformStream(line => {
+					if (line.includes("command not found")) {
+						task.title = taskTitle === command
+							? `${taskTitle}: command not found.`
+							: `${taskTitle}: command "${command}" not found.`;
 
-				task.title += `: running "${command}"...`;
+						endTask();
+					}
 
-				const { exitCode, all, message } = await executeCommand as ExecaReturnValue & { all: string; message: string };
+					return line;
+				})).pipe(task.stdout());
 
-				if (exitCode === 127 || message?.includes("ENOENT")) {
-					task.title = taskTitle === command
-						? `${taskTitle}: command not found.`
-						: `${taskTitle}: command "${command}" not found.`;
-
-					task.output = "";
-					endTask();
-				}
+				const { exitCode, all } = await executeCommand as ExecaReturnValue & { all: string };
 
 				task.title = taskTitle;
 				const { shouldTrim, output } = trimIfNeeded(all);

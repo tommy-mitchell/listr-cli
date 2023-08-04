@@ -65,6 +65,7 @@
 		"ci-info": "^3.8.0",
 		"get-bin-path": "^10.0.0",
 		"is-executable": "^2.0.1",
+		"line-transform-stream": "^1.0.1",
 		"replace-in-files-cli": "^2.2.0",
 		"strip-ansi": "^7.1.0",
 		"tsx": "^3.12.7",
