@@ -18,7 +18,7 @@ npm install --save-dev listr-cli
 <summary>Other Package Managers</summary>
 
 ```sh
-yarn add -D listr-cli
+yarn add --dev listr-cli
 ```
 </details>
 
@@ -34,13 +34,13 @@ Equivalent to `command1 && command2 && …`.
 
 ### Named Tasks
 
-Tasks can be prefixed with a custom name. Multi-word titles must be surrounded by quotes. By default, task titles use the first word of a command.
+Tasks can be prefixed with a custom name, in the form `title::command`. Multi-word titles must be surrounded by quotes. By default, task titles use the first word of a command.
 
 <details>
 <summary>Example</summary>
 
 ```sh
-$ listr lint::xo tsd
+$ listr 'lint::xo --fix' tsd
 ✔ lint [5s]
 ✔ tsd [2s]
 ```
@@ -48,6 +48,37 @@ $ listr lint::xo tsd
 </details>
 
 ### Options
+
+#### `--hide-timer`
+
+Disable showing successful task durations. By default, durations are shown.
+
+<details>
+<summary>Example</summary>
+
+```sh
+$ npx listr xo tsd --hide-timer
+✔ xo
+✔ tsd
+```
+
+</details>
+
+#### `--no-persist`
+
+Disable persisting task output. By default, task outputs persist after completion.
+
+<details>
+<summary>Example</summary>
+
+```sh
+$ npx listr xo ava --no-persist
+✔ xo [2s]
+⠼ ava
+  › ✔ cli › main
+```
+
+</details>
 
 #### `--all-optional` (`--opt`)
 
@@ -62,21 +93,6 @@ $ listr xo 'ava --tap | node parse.js' tsd --all-optional
 ✖ ava
   › Passed: 10, Failed: 2
 ✔ tsd [2s]
-```
-
-</details>
-
-#### `--hide-timer`
-
-Disable showing successful task durations. By default, durations are shown.
-
-<details>
-<summary>Example</summary>
-
-```sh
-$ npx listr xo tsd --hide-timer
-✔ xo
-✔ tsd
 ```
 
 </details>

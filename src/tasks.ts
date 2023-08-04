@@ -22,9 +22,10 @@ type TaskContext = {
 	commands: Command[];
 	exitOnError: boolean;
 	showTimer: boolean;
+	persistentOutput: boolean;
 };
 
-export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
+export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput }: TaskContext) => {
 	const tasks: Array<ListrTask<ListrContext>> = [];
 
 	for (const { taskTitle, command } of commands) {
@@ -66,7 +67,7 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 				}
 			},
 			options: {
-				persistentOutput: true,
+				persistentOutput,
 			},
 		});
 	}
