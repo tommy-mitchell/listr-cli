@@ -36,25 +36,34 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 					return $({ shell: true, stdio: "inherit" })`${command}`;
 				}
 
+				const executeCommand = $$`${command}`;
+
+				executeCommand.stdout?.pipe(task.stdout());
+				executeCommand.stderr?.pipe(task.stdout());
+
 				task.title += `: running "${command}"...`;
 
-				const { exitCode, all, message } = await $$`${command}` as ExecaReturnValue & { all: string; message: string };
+				const { exitCode, all, message } = await executeCommand as ExecaReturnValue & { all: string; message: string };
 
 				if (exitCode === 127 || message?.includes("ENOENT")) {
 					task.title = taskTitle === command
 						? `${taskTitle}: command not found.`
 						: `${taskTitle}: command "${command}" not found.`;
 
+					task.output = "";
 					endTask();
 				}
 
 				task.title = taskTitle;
+				const { shouldTrim, output } = trimIfNeeded(all);
 
-				if (exitCode !== 0) {
-					endTask(trimIfNeeded(all));
+				if (shouldTrim) {
+					task.output = output;
 				}
 
-				task.output = trimIfNeeded(all);
+				if (exitCode !== 0) {
+					endTask();
+				}
 			},
 			options: {
 				persistentOutput: true,
@@ -70,6 +79,7 @@ export const getTasks = ({ commands, exitOnError, showTimer }: TaskContext) => {
 				...PRESET_TIMER,
 				condition: showTimer,
 			},
+			showErrorMessage: false,
 			collapseErrors: false,
 			formatOutput: "wrap",
 			removeEmptyLines: false,

@@ -5,6 +5,7 @@ import { $ } from "execa";
 import { applyEnvironmentVariables, getCommands } from "./helpers/index.js";
 import { getTasks } from "./tasks.js";
 
+// TODO: add option to collapse output from finished tasks while running
 const cli = meow(`
 	Usage
 	  $ listr [title::]<command> […]
