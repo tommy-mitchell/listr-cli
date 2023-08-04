@@ -127,7 +127,7 @@ test("commands with only one non-empty line output are trimmed", cliPasses, [
 ]);
 
 test("commands with multiline outputs aren't trimmed", cliPasses, [
-	"node -e '[...Array(5).keys()].forEach(i => console.log(i))'",
+	"echo '0\\n1\\n2\\n3\\n4\\n'",
 ]);
 
 test("outputs stdout", cliPasses, [
