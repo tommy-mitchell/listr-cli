@@ -1,5 +1,6 @@
 import process from "node:process";
 import anyTest, { type TestFn } from "ava";
+import { Semaphore, type Permit } from "@shopify/semaphore";
 import { execa } from "execa";
 import { getBinPath } from "get-bin-path";
 import { isExecutable } from "is-executable";
@@ -7,6 +8,7 @@ import stripAnsi from "strip-ansi";
 
 const test = anyTest as TestFn<{
 	binPath: string;
+	permit: Permit;
 }>;
 
 test.before("setup context", async t => {
@@ -19,6 +21,17 @@ test.before("setup context", async t => {
 
 // eslint-disable-next-line no-return-assign
 test.before("disable CI check", () => process.env.CI = "false");
+
+// https://github.com/avajs/ava/discussions/3177
+const semaphore = new Semaphore(Number(process.env.concurrency) || 5);
+
+test.beforeEach("setup concurrency", async t => {
+	t.context.permit = await semaphore.acquire();
+});
+
+test.afterEach.always(async t => {
+	await t.context.permit.release();
+});
 
 const trim = (stdout: string) => stdout.trim().split("\n").map(line => stripAnsi(line).trim());
 
