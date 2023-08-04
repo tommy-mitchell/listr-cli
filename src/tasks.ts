@@ -1,5 +1,5 @@
 import process from "node:process";
-import { Listr, PRESET_TIMER, type ListrTask } from "listr2";
+import { Listr, PRESET_TIMER, type ListrTask, ListrErrorTypes } from "listr2";
 import { $, type ExecaReturnValue } from "execa";
 import { isCI } from "ci-info";
 import LineTransformStream from "line-transform-stream";
@@ -29,7 +29,7 @@ type TaskContext = {
 export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput }: TaskContext) => {
 	const tasks: Array<ListrTask<ListrContext>> = [];
 
-	for (const { taskTitle, command } of commands) {
+	for (const { taskTitle, command, commandName } of commands) {
 		tasks.push({
 			title: taskTitle,
 			// @ts-expect-error: return works
@@ -41,19 +41,27 @@ export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput }:
 				task.title += `: running "${command}"...`;
 				const executeCommand = $$`${command}`;
 
+				let commandNotFound = false;
+
 				executeCommand.all?.pipe(new LineTransformStream(line => {
-					if (line.includes("command not found")) {
+					// eslint-disable-next-line unicorn/prefer-regexp-test
+					if (line.match(new RegExp(`${commandName}.*not found`))) {
 						task.title = taskTitle === command
 							? `${taskTitle}: command not found.`
 							: `${taskTitle}: command "${command}" not found.`;
 
-						endTask();
+						commandNotFound = true;
+						return "";
 					}
 
 					return line;
 				})).pipe(task.stdout());
 
 				const { exitCode, all } = await executeCommand as ExecaReturnValue & { all: string };
+
+				if (commandNotFound) {
+					endTask();
+				}
 
 				task.title = taskTitle;
 				const { shouldTrim, output } = trimIfNeeded(all);

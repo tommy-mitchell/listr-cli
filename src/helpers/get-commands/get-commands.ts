@@ -12,10 +12,10 @@ import { parseUnnamedCommand } from "./parse-unnamed-command.js";
  * getCommands(["lint::xo", "tsd", "coverage and tests::c8 ava", "\"yarn run:tests\""]);
  *
  * [
- * 	{ taskTitle: "lint",               command: "xo"             },
- * 	{ taskTitle: "tsd",                command: "tsd"            },
- * 	{ taskTitle: "coverage and tests", command: "c8 ava"         },
- * 	{ taskTitle: "yarn",               command: "yarn run:tests" },
+ * 	{ taskTitle: "lint",               command: "xo",             commandName: "xo"   },
+ * 	{ taskTitle: "tsd",                command: "tsd",            commandName: "tsd"  },
+ * 	{ taskTitle: "coverage and tests", command: "c8 ava",         commandName: "c8"   },
+ * 	{ taskTitle: "yarn",               command: "yarn run:tests", commandName: "yarn" },
  * ]
  */
 export const getCommands = (input: string[]): Command[] => input.map(rawCommand => {

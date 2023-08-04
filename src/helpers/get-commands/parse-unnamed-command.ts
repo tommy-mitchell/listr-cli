@@ -9,5 +9,5 @@ export const parseUnnamedCommand = (command: string): Command => {
 	command = removeSurroundingQuotes(command);
 
 	const [commandName] = command.split(" ", 1);
-	return { taskTitle: commandName, command };
+	return { taskTitle: commandName, command, commandName };
 };
