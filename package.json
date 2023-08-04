@@ -31,7 +31,8 @@
 		"prepack": "npm run build",
 		"build": "tsc && chmodx --package",
 		"postbuild": "replace-in-files dist/cli.js --string='#!/usr/bin/env tsx' --replacement='#!/usr/bin/env node'",
-		"test": "xo && tsc --noEmit && c8 npm run ava",
+		"lint": "xo",
+		"test": "tsc --noEmit && c8 npm run ava",
 		"ava": "NODE_OPTIONS='--loader=tsx --no-warnings=ExperimentalWarning' ava"
 	},
 	"ava": {

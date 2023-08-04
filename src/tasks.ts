@@ -1,5 +1,5 @@
 import process from "node:process";
-import { Listr, PRESET_TIMER, type ListrTask, ListrErrorTypes } from "listr2";
+import { Listr, PRESET_TIMER, type ListrTask } from "listr2";
 import { $, type ExecaReturnValue } from "execa";
 import { isCI } from "ci-info";
 import LineTransformStream from "line-transform-stream";
