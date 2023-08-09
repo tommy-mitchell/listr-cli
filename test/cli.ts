@@ -20,10 +20,10 @@ test.before("setup context", async t => {
 });
 
 // eslint-disable-next-line no-return-assign
-test.before("disable CI check", () => process.env.CI = "false");
+test.before("disable CI check", () => process.env["CI"] = "false");
 
 // https://github.com/avajs/ava/discussions/3177
-const semaphore = new Semaphore(Number(process.env.concurrency) || 5);
+const semaphore = new Semaphore(Number(process.env["concurrency"]) || 5);
 
 test.beforeEach("setup concurrency", async t => {
 	t.context.permit = await semaphore.acquire();
@@ -143,7 +143,7 @@ test("outputs stdout and stderr", cliPasses, [
 ]);
 
 // eslint-disable-next-line no-return-assign
-const cliPassesCi = verifyCli(true, async () => process.env.CI = "true", async () => process.env.CI = "false");
+const cliPassesCi = verifyCli(true, async () => process.env["CI"] = "true", async () => process.env["CI"] = "false");
 
 test.serial("uses silent renderer in CI", cliPassesCi, [
 	"node -e 'console.log(true)'",

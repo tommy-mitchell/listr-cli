@@ -44,7 +44,6 @@ export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput }:
 				let commandNotFound = false;
 
 				executeCommand.all?.pipe(new LineTransformStream(line => {
-					// eslint-disable-next-line unicorn/prefer-regexp-test
 					if (line.match(new RegExp(`${commandName}.*not found`))) {
 						task.title = taskTitle === command
 							? `${taskTitle}: command not found.`

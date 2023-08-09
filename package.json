@@ -25,15 +25,14 @@
 		"dist"
 	],
 	"engines": {
-		"node": ">=16"
+		"node": ">=16.17"
 	},
 	"scripts": {
-		"prepack": "npm run build",
-		"build": "tsc && chmodx --package",
-		"postbuild": "replace-in-files dist/cli.js --string='#!/usr/bin/env tsx' --replacement='#!/usr/bin/env node'",
+		"prepare": "npm run build",
+		"build": "tsc -p tsconfig.build.json && execify --all",
 		"lint": "xo",
 		"test": "tsc --noEmit && c8 npm run ava",
-		"ava": "NODE_OPTIONS='--loader=tsx --no-warnings=ExperimentalWarning' ava"
+		"ava": "cross-env NODE_OPTIONS='--loader=tsx --no-warnings=ExperimentalWarning' ava"
 	},
 	"ava": {
 		"files": [
@@ -58,17 +57,18 @@
 		"meow": "^12.0.1"
 	},
 	"devDependencies": {
-		"@johnowennixon/chmodx": "^1.1.0",
 		"@shopify/semaphore": "^3.0.2",
 		"@tommy-mitchell/tsconfig": "^1.1.0",
 		"@types/node": "^20.4.2",
 		"ava": "^5.3.1",
 		"c8": "^8.0.0",
+		"cross-env": "^7.0.3",
+		"execify-cli": "beta",
 		"get-bin-path": "^10.0.0",
 		"is-executable": "^2.0.1",
-		"replace-in-files-cli": "^2.2.0",
 		"strip-ansi": "^7.1.0",
 		"tsx": "^3.12.7",
+		"type-fest": "^4.1.0",
 		"typescript": "~5.1.6",
 		"xo": "^0.54.2"
 	}

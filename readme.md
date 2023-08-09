@@ -4,7 +4,7 @@ Command-line task lists made pretty.
 
 <p align="center"><img src="media/demo.gif"></p>
 
-Gracefully handles and displays failures, including if a given command is not found. Supports local binaries from `node_modules/bin` without specifying `npx`, and allows [setting environment variables](#environment---env--e) cross-platform.
+Gracefully handles and displays failures, including if a given command is not found. Supports local binaries from `node_modules/.bin` without specifying `npx`, and allows [setting environment variables](#environment---env--e) cross-platform.
 
 If used in a CI environment, command output is outputted as is.
 

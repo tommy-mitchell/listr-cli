@@ -3,7 +3,8 @@
 		"arrow-parens": "off",
 		"quotes": ["error", "double"],
 		"object-curly-spacing": ["error", "always"],
-		"object-shorthand": ["error", "always", { "avoidExplicitReturnArrows": false }]
+		"object-shorthand": ["error", "always", { "avoidExplicitReturnArrows": false }],
+		"unicorn/prefer-regexp-test": "off"
 	},
 	"overrides": [
 		{
