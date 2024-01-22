@@ -19,11 +19,11 @@ type MaybeNamedCommand = NamedCommand | UnnamedCommand;
  * @see https://regex101.com/r/zhFo8i/4
  *
  * @example
-* 1. /(?!["'])/        // Ignore quoted tasks
-* 2. /(?<title>[^:]*)/ // Capture task title (anything before :)
-* 3. /::/              // Skip separator (::)
-* 4. /(?<command>.*)/  // Capture task command (anything after ::)
-*/
+ * 1. /(?!["'])/        // Ignore quoted tasks
+ * 2. /(?<title>[^:]*)/ // Capture task title (anything before :)
+ * 3. /::/              // Skip separator (::)
+ * 4. /(?<command>.*)/  // Capture task command (anything after ::)
+ */
 const commandRegex = /(?!["'])^(?<title>[^:"']*)::(?<command>.*)/m;
 
 export const parseNamedCommand = (command: string): MaybeNamedCommand => {

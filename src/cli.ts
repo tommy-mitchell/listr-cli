@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env tsimp
 import process from "node:process";
 import meow from "meow";
 import { $ } from "execa";

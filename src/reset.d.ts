@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
-
+/* eslint-disable @typescript-eslint/ban-types, @typescript-eslint/consistent-type-definitions */
 // From https://github.com/total-typescript/ts-reset/pull/110
 
 type Split<Splitter extends string, Limit extends number> = (

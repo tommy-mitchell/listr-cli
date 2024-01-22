@@ -3,3 +3,4 @@ coverage
 dist
 package-lock.json
 yarn.lock
+.tsimp
