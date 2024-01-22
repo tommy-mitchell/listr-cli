@@ -158,6 +158,7 @@ test("flags: -h", cliPasses, [
 test.todo("verify help text indentation is consistent");
 
 test.todo("task output displays color");
+test.todo("color can be disabled via NO_COLOR");
 
 const envVarsFixture = {
 	envVars: "FOO,BAR:baz",
@@ -196,3 +197,16 @@ test("custom task names ignores quoted tasks", cliPasses, [
 	"\"echo ::\"",
 	"'echo ::'",
 ]);
+
+test.todo("flags: --no-persist");
+
+test("outputs all lines by default", cliPasses, [
+	"node -e 'console.log(1);console.log(2);console.log(3);'",
+]);
+
+test("--output=all outputs all lines", cliPasses, [
+	"--output=all",
+	"node -e 'console.log(1);console.log(2);console.log(3);'",
+]);
+
+test.todo("--output=last outputs only previous line");
