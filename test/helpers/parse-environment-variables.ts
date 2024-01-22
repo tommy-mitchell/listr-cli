@@ -1,20 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import process from "node:process";
-import anyTest, { type TestFn } from "ava";
-import { applyEnvironmentVariables } from "../../src/helpers/apply-environment-variables.js";
-
-const test = anyTest as TestFn<{
-	originalProcessEnv: typeof process["env"];
-}>;
-
-test.beforeEach("reset process.env", t => {
-	t.context.originalProcessEnv = process.env;
-	process.env = {};
-});
-
-test.after("reapply process.env", t => {
-	process.env = t.context.originalProcessEnv;
-});
+import test from "ava";
+import { parseEnvironmentVariables } from "../../src/helpers/parse-environment-variables.js";
 
 type MacroArgs = {
 	env_Vars: string[];
@@ -22,12 +8,12 @@ type MacroArgs = {
 };
 
 const verifyEnv = test.macro((t, { env_Vars: input, expected }: MacroArgs) => {
-	applyEnvironmentVariables(input);
+	const env = parseEnvironmentVariables(input);
 
 	if (Array.isArray(expected)) {
-		t.deepEqual(Object.keys(process.env), expected);
+		t.deepEqual(Object.keys(env), expected);
 	} else {
-		t.deepEqual(process.env, expected);
+		t.deepEqual(env, expected);
 	}
 });
 

@@ -1,4 +1,3 @@
-import process from "node:process";
 import type { MatchAll } from "./types.js";
 
 /**
@@ -16,7 +15,7 @@ import type { MatchAll } from "./types.js";
 const environmentVariableRegex = /(?=[^,])(?<env>[^:,]*)(?::["'](?<quoted>[^"']*)["']|:(?<value>[^,]*))?/g;
 
 /**
- * Parses environment variable input into separate values, applying them to `process.env`.
+ * Parses environment variable input into separate values.
  *
  * Separates values by comma. Values are set to `"true"`. If a value has a `:`,
  * it will be split and set to the value following the `:`. Commas in values must be quoted.
@@ -25,13 +24,16 @@ const environmentVariableRegex = /(?=[^,])(?<env>[^:,]*)(?::["'](?<quoted>[^"']*
  * @example
  * // listr -e FOO -e BAR,LIST:\"a,b,c\",FOO,BAR:\'baz\' -e FIZZ:'buzz bazz'
  * applyEnvironmentVariables(["FOO", "BAR,LIST:\"a,b,c\",FOO,BAR:'baz'", "FIZZ:buzz bazz"]);
- *
- * process.env.FOO = "true";
- * process.env.BAR = "baz";
- * process.env.LIST = "a,b,c";
- * process.env.FIZZ = "buzz bazz";
+ * //=> {
+ * //=>   FOO: "true",
+ * //=>   BAR: "baz",
+ * //=>   LIST: "a,b,c",
+ * //=>   FIZZ: "buzz bazz",
+ * //=> }
  */
-export const applyEnvironmentVariables = (environment: string[]) => {
+export const parseEnvironmentVariables = (environment: string[]): Record<string, string> => {
+	const parsedEnvironmentVariables: Record<string, string> = {};
+
 	for (const argument of environment) {
 		const pairs = argument.matchAll(environmentVariableRegex) as MatchAll<"env", "quoted" | "value">;
 
@@ -39,7 +41,9 @@ export const applyEnvironmentVariables = (environment: string[]) => {
 			const key = pair.groups.env;
 			const value = pair.groups.quoted ?? pair.groups.value;
 
-			process.env[key] = value ?? String(true);
+			parsedEnvironmentVariables[key] = value ?? String(true);
 		}
 	}
+
+	return parsedEnvironmentVariables;
 };
