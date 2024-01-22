@@ -1,6 +1,7 @@
 import process from "node:process";
-import { Listr, PRESET_TIMER, type ListrTask } from "listr2";
-import { $, type ExecaReturnValue } from "execa";
+import type { TupleToUnion } from "type-fest";
+import { Listr, PRESET_TIMER, type ListrTask, type DefaultRenderer } from "listr2";
+import { type $, type ExecaReturnValue } from "execa";
 import { isCI } from "ci-info";
 import LineTransformStream from "line-transform-stream";
 import { type Command, trimIfNeeded } from "./helpers/index.js";
@@ -17,25 +18,30 @@ export const endTask = (output = "") => {
 
 type ListrContext = {
 	$$: typeof $;
+	ci: typeof $;
 };
+
+export const outputTypes = ["all", "last"] as const;
+export type OutputType = TupleToUnion<typeof outputTypes>;
 
 type TaskContext = {
 	commands: Command[];
 	exitOnError: boolean;
 	showTimer: boolean;
 	persistentOutput: boolean;
+	outputType: OutputType;
 };
 
-export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput }: TaskContext) => {
-	const tasks: Array<ListrTask<ListrContext>> = [];
+export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput, outputType }: TaskContext) => {
+	const tasks: Array<ListrTask<ListrContext, typeof DefaultRenderer>> = [];
 
 	for (const { taskTitle, command, commandName } of commands) {
 		tasks.push({
 			title: taskTitle,
 			// @ts-expect-error: return works
-			task: async ({ $$ }, task) => {
+			task: async ({ $$, ci }, task) => {
 				if (isCI) {
-					return $({ shell: true, stdio: "inherit" })`${command}`;
+					return ci`${command}`;
 				}
 
 				task.title += `: running "${command}"...`;
@@ -43,6 +49,8 @@ export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput }:
 
 				let commandNotFound = false;
 
+				// TODO: createWriteable
+				// https://listr2.kilic.dev/task/output.html#render-output-of-a-command
 				executeCommand.all?.pipe(new LineTransformStream(line => {
 					if (line.match(new RegExp(`${commandName}.*not found`))) {
 						task.title = taskTitle === command
@@ -73,15 +81,15 @@ export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput }:
 					endTask();
 				}
 			},
-			options: {
+			rendererOptions: {
 				persistentOutput,
+				outputBar: outputType === "all" ? Number.POSITIVE_INFINITY : true,
 			},
 		});
 	}
 
 	return new Listr<ListrContext, "default", "verbose">(tasks, {
 		exitOnError,
-		forceColor: true,
 		rendererOptions: {
 			timer: {
 				...PRESET_TIMER,

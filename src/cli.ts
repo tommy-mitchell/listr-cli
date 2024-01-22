@@ -3,7 +3,7 @@ import process from "node:process";
 import meow from "meow";
 import { $ } from "execa";
 import { parseEnvironmentVariables, getCommands } from "./helpers/index.js";
-import { getTasks } from "./tasks.js";
+import { getTasks, outputTypes, type OutputType } from "./tasks.js";
 
 const cli = meow(`
 	Usage
@@ -46,6 +46,11 @@ const cli = meow(`
 			type: "boolean",
 			default: true,
 		},
+		output: {
+			type: "string",
+			default: "all",
+			choices: outputTypes as unknown as string[],
+		},
 		allOptional: {
 			type: "boolean",
 			aliases: ["opt"],
@@ -67,20 +72,21 @@ if (input.length === 0 || helpShortFlag) {
 	cli.showHelp(0);
 }
 
-const { hideTimer, persist: persistentOutput, allOptional, environment } = cli.flags;
+const { hideTimer, persist: persistentOutput, output, allOptional, environment } = cli.flags;
+const outputType = output as OutputType;
 
 const env = parseEnvironmentVariables(environment);
 
-process.env = {
-	...process.env,
-	...env,
-};
+if (!process.env["NO_COLOR"]) {
+	env["FORCE_COLOR"] = "true";
+}
 
 const tasks = getTasks({
 	commands: getCommands(input),
 	exitOnError: !allOptional,
 	showTimer: !hideTimer,
 	persistentOutput,
+	outputType,
 });
 
 const $$ = $({
@@ -88,6 +94,13 @@ const $$ = $({
 	reject: false,
 	all: true,
 	stripFinalNewline: false, // Keep command output formatting
+	env,
 });
 
-await tasks.run({ $$ }).catch(() => process.exit(1));
+const ci = $({
+	shell: true,
+	stdio: "inherit",
+	env,
+});
+
+await tasks.run({ $$, ci }).catch(() => process.exit(1));

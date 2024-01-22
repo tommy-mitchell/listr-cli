@@ -20,6 +20,7 @@ npm install --save-dev listr-cli
 ```sh
 yarn add --dev listr-cli
 ```
+
 </details>
 
 ## Usage
@@ -80,6 +81,30 @@ $ npx listr xo ava --no-persist
 
 </details>
 
+#### `--output`
+
+Choices: `all` | `last`\
+Default: `all`
+
+Control the length of task output. `all` shows all output, `last` shows only the last line of output. By default, all lines are shown.
+
+<details>
+<summary>Example</summary>
+
+```sh
+$ npx listr ava
+⠼ ava
+  › ✔ cli › main
+  › ✔ cli › output flag
+  › ...
+
+$ npx listr ava --output last
+✔ ava [2s]
+  › 7 tests passed
+```
+
+</details>
+
 #### `--all-optional` (`--opt`)
 
 Continue executing tasks if one fails. By default, the task list will cancel early.
@@ -99,12 +124,20 @@ $ listr xo 'ava --tap | node parse.js' tsd --all-optional
 
 #### `--environment` (`--env`, `-e`)
 
-Set environment variables cross-platform via `process.env`. Follows the same syntax as [Rollup](https://rollupjs.org/command-line-interface/#environment-values):
+Set environment variables cross-platform via `process.env` (see [`execa`](https://github.com/sindresorhus/execa#env)). Follows the same syntax as [Rollup](https://rollupjs.org/command-line-interface/#environment-values):
 
 ```sh
 $ listr ava --env CI,NODE_OPTIONS:'--loader=tsx'
 #=> process.env.CI = "true"
 #=> process.env.NODE_OPTIONS = "--loader=tsx"
+```
+
+#### `NO_COLOR`
+
+To disable colors, set the `NO_COLOR` environment variable to any value:
+
+```sh
+$ NO_COLOR=1 listr xo ava
 ```
 
 ## Related
