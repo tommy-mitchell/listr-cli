@@ -101,7 +101,7 @@ export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput, o
 			removeEmptyLines: false,
 		},
 		silentRendererCondition: isCI,
-		fallbackRenderer: "verbose", // TODO: maybe use test renderer, it can log failed states
+		fallbackRenderer: "verbose", // TODO: maybe use test renderer -> would require refactoring tests to test tasks themselves
 		fallbackRendererCondition: process.env["NODE_ENV"] === "test",
 		fallbackRendererOptions: {
 			logTitleChange: true,
