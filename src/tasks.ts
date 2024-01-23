@@ -1,9 +1,8 @@
 import process from "node:process";
 import type { TupleToUnion } from "type-fest";
-import { Listr, PRESET_TIMER, type ListrTask, type DefaultRenderer } from "listr2";
+import { Listr, createWritable, PRESET_TIMER, type ListrTask, type DefaultRenderer } from "listr2";
 import { type $, type ExecaReturnValue } from "execa";
 import { isCI } from "ci-info";
-import LineTransformStream from "line-transform-stream";
 import { type Command, trimIfNeeded } from "./helpers/index.js";
 
 /**
@@ -49,20 +48,20 @@ export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput, o
 
 				let commandNotFound = false;
 
-				// TODO: createWriteable
-				// https://listr2.kilic.dev/task/output.html#render-output-of-a-command
-				executeCommand.all?.pipe(new LineTransformStream(line => {
-					if (line.match(new RegExp(`${commandName}.*not found`))) {
+				const taskOutput = createWritable(chunk => {
+					if (chunk.toString().match(new RegExp(`${commandName}.*not found`))) {
 						task.title = taskTitle === command
 							? `${taskTitle}: command not found.`
 							: `${taskTitle}: command "${command}" not found.`;
 
 						commandNotFound = true;
-						return "";
+						task.output = "";
+					} else {
+						task.output = chunk;
 					}
+				});
 
-					return line;
-				})).pipe(task.stdout());
+				executeCommand.all?.pipe(taskOutput);
 
 				const { exitCode, all } = await executeCommand as ExecaReturnValue & { all: string };
 
@@ -101,7 +100,7 @@ export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput, o
 			removeEmptyLines: false,
 		},
 		silentRendererCondition: isCI,
-		fallbackRenderer: "verbose", // TODO: maybe use test renderer -> would require refactoring tests to test tasks themselves
+		fallbackRenderer: "verbose",
 		fallbackRendererCondition: process.env["NODE_ENV"] === "test",
 		fallbackRendererOptions: {
 			logTitleChange: true,
