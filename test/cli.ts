@@ -35,16 +35,27 @@ test.afterEach.always(async t => {
 
 const trim = (stdout: string) => stdout.trim().split("\n").map(line => stripAnsi(line).trim());
 
+type MacroArgs = [
+	commands: string[],
+	options?: { errorMessage: string },
+];
+
 const verifyCli = (shouldPass: boolean, setup = async () => "", teardown = async () => "") => (
-	test.macro(async (t, commands: string[]) => {
+	test.macro<MacroArgs>(async (t, commands, options) => {
 		await setup();
 
-		const { exitCode, stdout } = await execa(t.context.binPath, commands, { reject: false });
+		const { exitCode, stdout, stderr } = await execa(t.context.binPath, commands, { reject: false });
 		const receivedLines = trim(stdout);
 
 		const assertions = await t.try(tt => {
-			tt.snapshot(receivedLines);
 			tt.is(exitCode, shouldPass ? 0 : 1, "CLI exited with the wrong exit code!");
+
+			if (options?.errorMessage) {
+				tt.true(stderr.includes(options.errorMessage), "Error message did not match!");
+				tt.snapshot(options.errorMessage);
+			} else {
+				tt.snapshot(receivedLines);
+			}
 		});
 
 		if (!assertions.passed) {
@@ -158,6 +169,7 @@ test("flags: -h", cliPasses, [
 test.todo("verify help text indentation is consistent");
 
 test.todo("task output displays color");
+test.todo("color can be disabled via NO_COLOR");
 
 const envVarsFixture = {
 	envVars: "FOO,BAR:baz",
@@ -196,3 +208,23 @@ test("custom task names ignores quoted tasks", cliPasses, [
 	"\"echo ::\"",
 	"'echo ::'",
 ]);
+
+test.todo("flags: --no-persist");
+
+test("outputs all lines by default", cliPasses, [
+	"node -e 'console.log(1);console.log(2);console.log(3);'",
+]);
+
+test("--output=all outputs all lines", cliPasses, [
+	"--output=all",
+	"node -e 'console.log(1);console.log(2);console.log(3);'",
+]);
+
+test.todo("--output=last outputs only previous line");
+
+test("flags: --output errors on invalid choice", cliFails, [
+	"--output=foo",
+	"node -e 'console.log(1);console.log(2);console.log(3);'",
+], {
+	errorMessage: "Unknown value for flag `--output`: `foo`. Value must be one of: [`all`, `last`]",
+});

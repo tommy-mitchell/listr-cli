@@ -47,11 +47,16 @@
 			"--import=tsimp"
 		]
 	},
+	"tsimp": {
+		"compilerOptions": {
+			"noUnusedLocals": true,
+			"noUnusedParameters": true
+		}
+	},
 	"dependencies": {
-		"ci-info": "^3.8.0",
-		"execa": "^7.1.1",
-		"line-transform-stream": "^1.0.1",
-		"listr2": "^6.6.0",
+		"ci-info": "^4.0.0",
+		"execa": "^8.0.1",
+		"listr2": "^8.0.1",
 		"meow": "^13.1.0"
 	},
 	"devDependencies": {
