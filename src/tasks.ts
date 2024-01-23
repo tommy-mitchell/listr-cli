@@ -49,6 +49,7 @@ export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput, o
 				let commandNotFound = false;
 
 				const taskOutput = createWritable(chunk => {
+					// TODO: this isn't cross-platform
 					if (chunk.toString().match(new RegExp(`${commandName}.*not found`))) {
 						task.title = taskTitle === command
 							? `${taskTitle}: command not found.`
@@ -56,9 +57,10 @@ export const getTasks = ({ commands, exitOnError, showTimer, persistentOutput, o
 
 						commandNotFound = true;
 						task.output = "";
-					} else {
-						task.output = chunk;
+						return;
 					}
+
+					task.output = chunk;
 				});
 
 				executeCommand.all?.pipe(taskOutput);
